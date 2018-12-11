@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html class="w3c">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>${mail.title}</title>
+<style type="text/css">
+h2 {
+    color: #ff0000;
+}
+
+table {
+    *border-collapse: collapse; /* IE7 and lower */
+    border-spacing: 0;
+    width: 100%;
+}
+
+.bordered {
+    border: solid #ccc 1px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 1px #ccc;
+    -moz-box-shadow: 0 1px 1px #ccc;
+    box-shadow: 0 1px 1px #ccc;
+}
+
+.bordered tr:hover {
+    background: #fbf8e9;
+    -o-transition: all 0.1s ease-in-out;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
+}
+
+.bordered td, .bordered th {
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+.bordered th {
+    background-color: #dce9f9;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#ebf3fc), to(#dce9f9));
+    background-image: -webkit-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:    -moz-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:     -ms-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:      -o-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:         linear-gradient(top, #ebf3fc, #dce9f9);
+    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
+    -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
+    border-top: none;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+}
+
+.bordered td:first-child, .bordered th:first-child {
+    border-left: none;
+}
+
+.bordered th:first-child {
+    -moz-border-radius: 6px 0 0 0;
+    -webkit-border-radius: 6px 0 0 0;
+    border-radius: 6px 0 0 0;
+}
+
+.bordered th:last-child {
+    -moz-border-radius: 0 6px 0 0;
+    -webkit-border-radius: 0 6px 0 0;
+    border-radius: 0 6px 0 0;
+}
+
+.bordered th:only-child{
+    -moz-border-radius: 6px 6px 0 0;
+    -webkit-border-radius: 6px 6px 0 0;
+    border-radius: 6px 6px 0 0;
+}
+
+.bordered tr:last-child td:first-child {
+    -moz-border-radius: 0 0 0 6px;
+    -webkit-border-radius: 0 0 0 6px;
+    border-radius: 0 0 0 6px;
+}
+
+.bordered tr:last-child td:last-child {
+    -moz-border-radius: 0 0 6px 0;
+    -webkit-border-radius: 0 0 6px 0;
+    border-radius: 0 0 6px 0;
+}
+</style>
+</head>
+<body>
+#if ($result.service && $result.service.size() > 0)
+<div>
+    <h1>${translate.mail.service_status}</h1>
+    <table class="bordered">
+      <thead>
+        <tr>
+          <th scope="col">${translate.store.code}</th>
+          <th scope="col">${translate.store.name}</th>
+          <th scope="col">${translate.mail.service_name}</th>
+          <th scope="col">${translate.mail.service_status}</th>
+        </tr>
+      </thead>
+      #foreach ($service in $!result.service)
+        <tr valign="top">
+      	  <td>${result.store.code}</td>  
+      	  <td>${result.store.name}</td>
+      	  <td>${service.name}</td>
+      	  #if ($service.status)
+      	  <td>${translate.mail.service_start_success}</td>
+      	  #else
+      	  <td>${translate.mail.service_start_fail}</td>
+      	  #end
+        </tr>
+      #end
+    </table>
+</div>
+#end
+
+#if ($result.disk)
+<div>
+  <h1>${translate.mail.disk}</h1>
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th scope="col">${translate.store.code}</th>
+        <th scope="col">${translate.store.name}</th>     
+        <th scope="col">${translate.mail.disk_status}</th>
+        <th scope="col">${translate.mail.disk_package_amount}(${translate.level.small})</th>
+        <th scope="col">${translate.mail.disk_package_amount}(${translate.level.middle})</th>
+        <th scope="col">${translate.mail.disk_package_amount}(${translate.level.large})</th>
+      </tr>
+    </thead>
+    <tr valign="top">
+	  <td>${result.store.code}</td>
+	  <td>${result.store.name}</td>
+	  #if ($result.disk.status == 1)
+      <td>${translate.level.warning}</td>
+      #end
+      #if ($result.disk.status == 2)
+      <td>${translate.level.serious}</td>
+      #end
+      #if ($result.disk.status == 3)
+      <td>${translate.level.collapse}</td>
+      #end
+      <td>${result.disk.packageAmount.s}</td>
+      <td>${result.disk.packageAmount.m}</td>
+      <td>${result.disk.packageAmount.l}</td>
+    </tr>
+  </table>
+</div>
+#end
+
+#if ($result.network)
+<div>
+  <h1>${translate.mail.network}</h1>
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th scope="col">${translate.store.code}</th>
+        <th scope="col">${translate.store.name}</th>
+        <th scope="col">${translate.mail.network_status}</th>
+        <th scope="col">${translate.mail.network_lost_package_rate}</th>
+      </tr>
+    </thead>
+    <tr valign="top">
+	  <td>${result.store.code}</td>
+	  <td>${result.store.name}</td>
+      #if ($result.network.status == 1)
+      <td>${translate.level.warning}</td>
+      #end
+      #if ($result.network.status == 2)
+      <td>${translate.level.serious}</td>
+      #end
+      #if ($result.network.status == 3)
+      <td>${translate.level.collapse}</td>
+      #end
+      <td>${result.network.packageAmount.s}%</td>
+    </tr>
+  </table>
+</div>
+#end
+
+</body>
+</html>

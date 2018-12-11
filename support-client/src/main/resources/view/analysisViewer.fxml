@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.GridPane?>
+
+<AnchorPane fx:id="ap" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanshow.monitor.gui.AnalysisViewerController">
+   <children>
+      <Button fx:id="forward" layoutX="525.0" layoutY="363.0" mnemonicParsing="false" onAction="#forward" text="下一步" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="30.0" />
+      <GridPane layoutX="90.0" layoutY="152.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+            <ColumnConstraints />
+            <ColumnConstraints />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+        <children>
+      <Label text="选择系统：" GridPane.rowIndex="0" />
+      <ChoiceBox fx:id="chooseSystem" prefWidth="150.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="0" />
+   </children>
+   <children>
+	  <Label text="安装路径：" GridPane.rowIndex="1" />
+      <TextField fx:id="path" minWidth="250.0" prefWidth="250.0"  GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+      <Button mnemonicParsing="true" onAction="#choosePath" text="选择" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+      <Label fx:id="message" text="路径不正确" textFill="RED" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" /> 
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+      </GridPane>
+   </children>
+</AnchorPane>

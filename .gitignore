@@ -1,0 +1,17 @@
+.metadata/
+.recommenders/
+support-core/.gradle/
+support-core/bin/
+support-core/gradle/
+support-upgrade-core/.gradle/
+support-upgrade-core/bin/
+support-upgrade-core/gradle/
+support-upgrade/.gradle/
+support-upgrade/bin/
+support-upgrade/gradle/
+support-client/.gradle/
+support-client/bin/
+support-client/gradle/
+support-server/.gradle/
+support-server/bin/
+support-server/gradle/

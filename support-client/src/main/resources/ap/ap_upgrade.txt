@@ -1,0 +1,32 @@
+########################################################################
+
+1. Copy the upgrade package to the root directory
+
+2. Modify the config.properties configuration file
+	Ap.upgrade.cmd= The absolute address of the root directory fast_upgrade.sh
+	Ap.upgrade.package= The absolute address of the root directory upgrade package
+	Eslworking.aps.url= ESL-Working url of the ap list
+
+3. Execute the start command
+	Double click startup.bat under windows
+	Execute ./startup.sh under linux
+
+4. Wait 10 minutes, the console will output the final upgrade result.
+
+
+########################################################################
+
+1.将升级包拷贝到根目录
+
+2.修改config.properties配置文件
+	ap.upgrade.cmd= 根目录fast_upgrade.sh的绝对地址
+	ap.upgrade.package= 根目录升级包的绝对接址
+	eslworking.aps.url= ESL-Working获取ap列表的接口访问地址
+
+3.执行启动命令
+	windows下双击startup.bat
+	linux下执行 ./startup.sh
+
+4.等待10分钟，控制台会输出最终升级结果
+
+########################################################################

@@ -1,0 +1,31 @@
+{
+	"store": {
+		"code": "门店编号",
+		"name": "门店名"
+	},
+	"mail": {
+		"title": "汉朔监控邮件",
+		"disk": "磁盘状态",
+		"network": "网络状态",
+		"service_name": "服务名",
+		"service_status": "服务状态",
+		"service_started": "服务已启动",
+		"service_stoped": "服务已关闭",
+		"service_start_success": "服务启动成功",
+		"service_start_fail": "服务启动失败",
+		"disk_status": "磁盘状态",
+		"disk_package_amount": "每小时打包数量",
+		"network_status": "网络状态",
+	 	"network_lost_package_rate": "网络丢包率(百分比)"
+	},
+	"level": {
+		"small": "小",
+		"middle": "中",
+		"large": "大",
+		"normal": "正常",
+		"warning": "警告",
+		"serious": "严重",
+		"collapse": "危险"
+		
+	}
+}
