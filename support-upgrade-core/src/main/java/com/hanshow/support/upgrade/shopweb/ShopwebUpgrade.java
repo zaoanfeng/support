@@ -3,6 +3,7 @@ package com.hanshow.support.upgrade.shopweb;
 import com.hanshow.support.upgrade.eslworking.ESLWorkingUpgrade;
 import com.hanshow.support.util.Config;
 import com.hanshow.support.util.ConfigCompare;
+import com.hanshow.support.util.DBUtils;
 import com.hanshow.support.util.FileUtils;
 import com.hanshow.support.util.SystemCmdManager;
 import java.io.BufferedWriter;
@@ -11,6 +12,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,19 +28,21 @@ public class ShopwebUpgrade {
 	private static final String SHOPWEB_LINUX_USER_GROUP = "shopweb.linux.user.group";
 	private static final String[] CONFIG_FILES = { "config.properties" };
 	private static final String[] OVERRIDE_CONFIG_FILES = { "business_fields.properties", "business_fields.json" };
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm");
 	private static Logger logger = LoggerFactory.getLogger(ESLWorkingUpgrade.class);
 
 	public void exec() {
 		System.out.println("Begin upgrade Shopweb >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+		// 关闭服务
 		try {
-			if (new SystemCmdManager().status(Config.getInstance().getString("shopweb.service.name"))) {
-				System.out.println("closing " + Config.getInstance().getString("shopweb.service.name") + " service");
-				new SystemCmdManager().stop(Config.getInstance().getString("shopweb.service.name"), 600000);
-				System.out.println("closed " + Config.getInstance().getString("shopweb.service.name") + " service");
+			if (new SystemCmdManager().status(Config.getInstance().getString(SHOPWEB_SERVICE_NAME))) {
+				System.out.println("closing " + Config.getInstance().getString(SHOPWEB_SERVICE_NAME) + " service");
+				new SystemCmdManager().stop(Config.getInstance().getString(SHOPWEB_SERVICE_NAME), 600000);
+				System.out.println("closed " + Config.getInstance().getString(SHOPWEB_SERVICE_NAME) + " service");
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-			System.out.println(Config.getInstance().getString("shopweb.service.name") + " not found");
+			System.out.println(Config.getInstance().getString(SHOPWEB_SERVICE_NAME) + " not found");
 			return;
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
@@ -53,31 +59,36 @@ public class ShopwebUpgrade {
 		String linuxUser = null;
 		String linuxUserGroup = null;
 		try {
-			shopwebDeployPath = URLDecoder.decode(Config.getInstance().getString("shopweb.deploy.path"), "utf-8");
-			shopwebBackupPath = URLDecoder.decode(Config.getInstance().getString("shopweb.backup.path"), "utf-8");
-			shopwebPacakgePath = URLDecoder.decode(Config.getInstance().getString("shopweb.package.path"), "utf-8");
-			linuxUser = Config.getInstance().getString("shopweb.linux.user");
-			linuxUserGroup = Config.getInstance().getString("shopweb.linux.user.group");
+			shopwebDeployPath = URLDecoder.decode(Config.getInstance().getString(SHOPWEB_DEPLOY_PATH), "utf-8");
+			shopwebBackupPath = URLDecoder.decode(Config.getInstance().getString(SHOPWEB_BACKUP_PATH), "utf-8");
+			shopwebPacakgePath = URLDecoder.decode(Config.getInstance().getString(SHOPWEB_PACKAGE_PATH), "utf-8");
+			linuxUser = Config.getInstance().getString(SHOPWEB_LINUX_USER);
+			linuxUserGroup = Config.getInstance().getString(SHOPWEB_LINUX_USER_GROUP);
 		} catch (UnsupportedEncodingException e) {
 			logger.error(e.getMessage(), e);
 			System.out.println(e.getMessage());
 			return;
 		}
 		try {
-			FileUtils.copyFolder(shopwebDeployPath,
-					shopwebBackupPath + File.separator + new File(shopwebDeployPath).getName());
-
+			// 备份项目
+			FileUtils.copyFolder(shopwebDeployPath, shopwebBackupPath + File.separator + new File(shopwebDeployPath).getName());
+			// 备份数据库
+			Map<String, String> config = FileUtils.readProperties(new File(shopwebDeployPath + File.separator + "WEB-INF" + File.separator + "classes" + File.separator + "config.properties"));
+			DBUtils.backup(DBUtils.MYSQL, config.get("db.url"), config.get("db.username"), config.get("db.password"), shopwebBackupPath + File.separator + sdf.format(new Date()) + File.separator + "shopweb.sql");
+			//备份完成删除
 			FileUtils.deleteFolder(new File(shopwebDeployPath));
-
+			// 拷备war包到tomcat/webapps下
 			FileUtils.copyFile(new File(shopwebPacakgePath), new File(shopwebDeployPath + ".war"));
-
+			// 解压war包
 			FileUtils.unzip(new File(shopwebDeployPath + ".war"), shopwebDeployPath);
 			shopwebBackupPath = new File(shopwebBackupPath, new File(shopwebDeployPath).getName()).getPath();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			System.out.println(e.getMessage());
+			System.exit(0);
 		}
 		String result = null;
+		// 修改config配置文件
 		for (String configFile : CONFIG_FILES) {
 			try {
 				result = ConfigCompare.compare(
@@ -89,35 +100,16 @@ public class ShopwebUpgrade {
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
-			try {
-				BufferedWriter out = new BufferedWriter(new FileWriter(new File(shopwebDeployPath + File.separator
-						+ "WEB-INF" + File.separator + "classes" + File.separator + configFile)));
-				Throwable localThrowable3 = null;
-				try {
+			try (BufferedWriter out = new BufferedWriter(new FileWriter(new File(shopwebDeployPath + File.separator + "WEB-INF" + File.separator + "classes" + File.separator + configFile)))) {
 					if (result != null) {
 						out.write(result);
 					}
-				} catch (Throwable localThrowable1) {
-					localThrowable3 = localThrowable1;
-					throw localThrowable1;
-				} finally {
-					if (out != null) {
-						if (localThrowable3 != null) {
-							try {
-								out.close();
-							} catch (Throwable localThrowable2) {
-								localThrowable3.addSuppressed(localThrowable2);
-							}
-						} else {
-							out.close();
-						}
-					}
-				}
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 				System.out.println(e.getMessage());
 			}
 		}
+		// 覆盖business_fields文件
 		for (String configFile : OVERRIDE_CONFIG_FILES) {
 			File file = new File(shopwebBackupPath + File.separator + "WEB-INF" + File.separator + "classes"
 					+ File.separator + configFile);
@@ -141,6 +133,7 @@ public class ShopwebUpgrade {
 				}
 			}
 		}
+		// linux下文件夹赋用户权限
 		if (!System.getProperty("os.name").toLowerCase().startsWith("window")) {
 			if ((linuxUser == null) || (linuxUserGroup == null)) {
 				System.out.println("user an user.group not defined !");
@@ -157,6 +150,7 @@ public class ShopwebUpgrade {
 				System.out.println(e.getMessage());
 			}
 		}
+		// 开服务
 		try {
 			new SystemCmdManager().start(Config.getInstance().getString("shopweb.service.name"), 600);
 			System.out.println("Startup Shopweb service successed");

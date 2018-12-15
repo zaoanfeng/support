@@ -84,6 +84,7 @@ public class ESLWorkingUpgrade {
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			System.out.println(e.getMessage());
+			return;
 		}
 		
 		//修改properties配置文件

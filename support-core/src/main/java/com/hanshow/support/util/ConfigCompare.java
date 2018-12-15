@@ -255,13 +255,26 @@ public class ConfigCompare {
 			while((line = srcReader.readLine()) != null) {
 				for (String key : keys) {
 					if (line.trim().startsWith(key) && !alreadyKeys.contains(key)) {
-						
-						if (!line.equals(searchMap.get(key))) {
+						if (key.equals("set DEFAULT_JVM_OPTS")) {
+							String old = searchMap.get(key);
+							old = old.substring(old.indexOf("-Xms"), old.length());
+							String oldXms = old.substring(0, old.indexOf(";"));
+							old = old.substring(old.indexOf("-Xmx"), old.length());
+							String oldXmx = old.substring(0, old.indexOf(";"));
+							
+							String newLine = line;
+							newLine = newLine.substring(newLine.indexOf("-Xms"), newLine.length());
+							String newXms = newLine.substring(0, newLine.indexOf(";"));
+							newLine = newLine.substring(newLine.indexOf("-Xmx"), newLine.length());
+							String newXmx = newLine.substring(0, newLine.indexOf(";"));
+							
+							line = line.replace(newXms, oldXms);
+							line = line.replace(newXmx, oldXmx);
+						} else if (key.equals("APP_HOME")) {
+							line = "APP_HOME=" + newVersionPath;
+						} else if (!line.equals(searchMap.get(key))) {
 							line = searchMap.get(key);
 						}
-						if (key.equals("APP_HOME")) {
-							line = line.substring(0, line.indexOf("APP_HOME=") + 9) + newVersionPath;
-						} 
 						alreadyKeys.add(key);
 					}
 				}

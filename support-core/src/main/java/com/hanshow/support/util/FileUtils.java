@@ -213,6 +213,13 @@ public class FileUtils {
 		}
 	}
 
+	/**
+	 * 获取文件字符编码
+	 * @param file
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws IOException
+	 */
 	public static Charset getFileEncode(File file) throws MalformedURLException, IOException {
 		CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
 
@@ -226,5 +233,28 @@ public class FileUtils {
 			return charset;
 		}
 		return Charset.forName("UTF-8");
+	}
+	
+	/**
+	 * 读properties配置文件
+	 * @param propertiesFile
+	 * @return
+	 * @throws IOException
+	 */
+	public static Map<String, String> readProperties(File propertiesFile) throws IOException {
+		if (!propertiesFile.exists()) {
+			throw new FileNotFoundException( propertiesFile + " is not exist!");
+		}
+		Properties prop = new Properties();
+		Map<String, String> map = new HashMap<>();
+		try(InputStream inputSteram = new FileInputStream(propertiesFile)) {
+			prop.load(inputSteram);
+			for(Object key : prop.keySet()) {
+				map.put((String)key, prop.getProperty((String)key));
+			}
+		} catch (IOException e) {
+			throw e;
+		} 
+		return map;
 	}
 }

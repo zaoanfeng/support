@@ -191,8 +191,7 @@ public class SystemCmdManager {
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	private boolean startOfWindows(String serviceName, int timeout)
-			throws IOException, InterruptedException, TimeoutException {
+	private boolean startOfWindows(String serviceName, int timeout) throws IOException, InterruptedException, TimeoutException {
 		Process process = Runtime.getRuntime().exec("net start " + serviceName.trim());
 		Worker worker = new Worker(process);
 		worker.start();
@@ -227,8 +226,7 @@ public class SystemCmdManager {
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	private boolean stopOfLinux(String serviceName, int timeout)
-			throws IOException, TimeoutException, InterruptedException {
+	private boolean stopOfLinux(String serviceName, int timeout) throws IOException, TimeoutException, InterruptedException {
 		return shellOfLinux(new String[] { "service", "-c", "/sbin/service " + serviceName.trim() + " stop" }, timeout);
 	}
 
@@ -283,8 +281,7 @@ public class SystemCmdManager {
 			throws IOException, InterruptedException, TimeoutException {
 		String path = exec.substring(0, exec.lastIndexOf(File.separator));
 		String cmd = exec.substring(exec.lastIndexOf(File.separator) + 1);
-		Process process = Runtime.getRuntime().exec("cmd /c " + cmd + " install " + serviceName.trim(), null,
-				new File(path));
+		Process process = Runtime.getRuntime().exec("cmd /c " + cmd + " install " + serviceName.trim(), null, new File(path));
 		Worker worker = new Worker(process);
 		worker.start();
 		try {

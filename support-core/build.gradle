@@ -41,5 +41,6 @@ dependencies {
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 	compile group: 'org.apache.velocity', name: 'velocity', version: '1.7'
+	compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
 }
 
