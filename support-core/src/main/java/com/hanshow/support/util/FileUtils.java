@@ -30,7 +30,7 @@ import info.monitorenter.cpdetector.io.UnicodeDetector;
 
 public class FileUtils {
 
-	private static final String ZIP_SUFFIX = ".zip";
+	private static final String ZIP_SUFFIX = ".zip", WAR_SUFFIX = ".war";
 
 	/**
 	 * 解压文件
@@ -44,8 +44,8 @@ public class FileUtils {
 		if (!srcFile.exists()) {
 			throw new FileNotFoundException(srcFile.getPath() + "isn't found");
 		}
-		if (!srcFile.getName().toLowerCase().endsWith(ZIP_SUFFIX)) {
-			throw new IOException("only support '.zip' file");
+		if (!srcFile.getName().toLowerCase().endsWith(ZIP_SUFFIX) && !srcFile.getName().toLowerCase().endsWith(WAR_SUFFIX)) {
+			throw new IOException("only support '.zip' or '.war' file");
 		}
 		try (ZipFile zipFile = new ZipFile(srcFile, getFileEncode(srcFile))) {
 			Enumeration<?> entries = zipFile.entries();
@@ -130,7 +130,7 @@ public class FileUtils {
 	public static void copyFile(File srcFile, File desFile, String[] excludeFolder) throws IOException {
 		if (!srcFile.exists()) {
 			if (!srcFile.exists()) {
-				throw new FileNotFoundException(srcFile.getPath() + "isn't found");
+				throw new FileNotFoundException(srcFile.getPath() + " isn't found");
 			}
 		}
 		if (Arrays.asList(excludeFolder).contains(srcFile.getName())){
@@ -247,8 +247,8 @@ public class FileUtils {
 		}
 		Properties prop = new Properties();
 		Map<String, String> map = new HashMap<>();
-		try(InputStream inputSteram = new FileInputStream(propertiesFile)) {
-			prop.load(inputSteram);
+		try(InputStream inputStream = new FileInputStream(propertiesFile)) {
+			prop.load(inputStream);
 			for(Object key : prop.keySet()) {
 				map.put((String)key, prop.getProperty((String)key));
 			}

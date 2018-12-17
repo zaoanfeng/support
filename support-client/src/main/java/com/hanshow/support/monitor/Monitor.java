@@ -2,6 +2,8 @@ package com.hanshow.support.monitor;
 
 import com.hanshow.support.monitor.mail.ServiceStatus;
 import com.hanshow.support.util.Config;
+import com.hanshow.support.util.SystemCmdManager;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +19,9 @@ public class Monitor {
 		String[] serviceNames = Config.getInstance().getString("monitor.service.name").split(",");
 		for (String serviceName : serviceNames) {
 			try {
-				if (!new ServiceManager().status(serviceName)) {
-					if (new ServiceManager().start(serviceName, 600)) {
-						if (new ServiceManager().status(serviceName)) {
+				if (!new SystemCmdManager().status(serviceName)) {
+					if (new SystemCmdManager().start(serviceName, 600)) {
+						if (new SystemCmdManager().status(serviceName)) {
 							logger.info(serviceName + " start success");
 							serviceStatusList.add(new ServiceStatus(serviceName, ServiceStatus.STARTED));
 						} else {

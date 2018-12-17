@@ -108,7 +108,6 @@ public class ApConfig {
 			// 接取文件
 			String localPath = System.getProperty("user.dir").toString();
 			ssh.scpFileFromRemote(REMOTE_PATH + REMOTE_FILE_NAME, localPath);
-			// 根据系统版本修改文件，当配置文件中的端口未配置时，3.2.0（含）以前版本为1234，之后版本为37021
 			Wini ini = new Wini(new File(localPath + File.separator + REMOTE_FILE_NAME));
 			ini.getConfig().setLineSeparator("\n");
 			ini.put("esl-working", "ipaddr", url);

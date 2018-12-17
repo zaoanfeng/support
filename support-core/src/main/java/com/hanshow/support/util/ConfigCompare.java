@@ -78,7 +78,7 @@ public class ConfigCompare {
 			String line = "";
 			while((line = reader.readLine()) != null) {
 				for(Object key : diff.keySet()) {
-					if (line.indexOf(key.toString()) != -1) {
+					if (line.trim().startsWith(key.toString())) {
 						line = (key.toString() + "=" + diff.get(key));
 					}
 				}
