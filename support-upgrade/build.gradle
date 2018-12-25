@@ -8,6 +8,7 @@
 
 // Apply the java-library plugin to add support for Java Library
 apply plugin: 'java-library'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -15,7 +16,14 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
-
+buildscript {  
+    repositories {  
+        jcenter()  
+    }  
+    dependencies {  
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'  
+    }  
+}  
 dependencies {
 	compile project(":support-core") 
 	compile project(":support-upgrade-core") 
@@ -28,5 +36,6 @@ dependencies {
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
     
+    // gradle clean shadowJar
 }
 

@@ -37,8 +37,13 @@ public class ShopwebUpgrade {
 		try {
 			if (new SystemCmdManager().status(Config.getInstance().getString(SHOPWEB_SERVICE_NAME))) {
 				System.out.println("closing " + Config.getInstance().getString(SHOPWEB_SERVICE_NAME) + " service");
-				new SystemCmdManager().stop(Config.getInstance().getString(SHOPWEB_SERVICE_NAME), 600000);
-				System.out.println("closed " + Config.getInstance().getString(SHOPWEB_SERVICE_NAME) + " service");
+				new SystemCmdManager().stop(Config.getInstance().getString(SHOPWEB_SERVICE_NAME), 600);
+				if (new SystemCmdManager().status(Config.getInstance().getString(SHOPWEB_SERVICE_NAME))) {
+					System.out.println("closed " + Config.getInstance().getString(SHOPWEB_SERVICE_NAME) + " service");
+				} else {
+					throw new IOException(Config.getInstance().getString(SHOPWEB_SERVICE_NAME) + " service close failed!");
+				}
+				
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
