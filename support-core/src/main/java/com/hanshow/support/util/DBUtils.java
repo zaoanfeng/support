@@ -8,11 +8,24 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class DBUtils {
 
 	private static final int BATCH_SIZE = 500;
+	private static String url;
+	private static String username;
+	private static String password;
 	public static final String MYSQL = "mysql";
+	
+	
+	public DBUtils() {}
+	
+	public DBUtils(String url, String username, String password) {
+		DBUtils.url = url;
+		DBUtils.username = username;
+		DBUtils.password = password;
+	}
 
 	public static void backup(String dbCategory, String url, String username, String password, String backupPath) throws Exception {
 		File file = new File(backupPath);
@@ -31,11 +44,11 @@ public class DBUtils {
 	}
 
 	private static void backupMysql(String url, String username, String password, File backupFile) throws Exception  {
-		Connection conn = null;
+		DBUtils.url = url;
+		DBUtils.username = username;
+		DBUtils.password = password;
+		Connection conn = getConnection();
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(backupFile))) {
-			// 数据库连接
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			conn = DriverManager.getConnection(url + "&serverTimezone=UTC", username, password);
 			ResultSet rs = conn.getMetaData().getTables(conn.getCatalog(), conn.getSchema(), "%", null);
 			while (rs.next()) {
 				// 获取表
@@ -87,7 +100,7 @@ public class DBUtils {
 					System.out.println("Backup " + rs.getString(3) + " data finished!");
 				}
 			}
-		} catch (IOException | SQLException | ClassNotFoundException e) {
+		} catch (IOException | SQLException e) {
 			throw e;
 		} finally {
 			if (conn != null) {
@@ -95,4 +108,54 @@ public class DBUtils {
 			}
 		}
 	}
+	
+	public Map<String, Object> select(String sql) throws Exception {
+		Map<String, Object> result = null;
+		Connection conn = getConnection();
+		try {
+			conn.prepareStatement(sql).executeQuery();
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (conn != null) {
+				conn.close();
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 *  更新、删除或插入
+	 * @param url
+	 * @param username
+	 * @param password
+	 * @param sqls
+	 * @throws Exception
+	 */
+	public void execute(String[] sqls) throws Exception {
+		Connection conn = getConnection();
+		try {
+			for (String sql : sqls) {
+				conn.prepareStatement(sql).executeUpdate();
+			}
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			if (conn != null) {
+				conn.close();
+			}
+		}
+	}
+	
+	private static Connection getConnection() throws Exception {
+		Connection conn = null;
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			conn = DriverManager.getConnection(url + "&serverTimezone=UTC", username, password);
+		} catch (SQLException | ClassNotFoundException e) {
+			throw e;
+		}
+		return conn;
+	}
+
 }

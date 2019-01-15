@@ -1,0 +1,19 @@
+将jdk\tomcat\mysql\eslworking 放在同一目录(全为绿色版)
+
+将备份好的数据库系统放到指根目录的mysql下的Data文件夹中
+
+修改tomcat、eslworking、integration的服务脚本，将jdk的路径配置进去
+
+修改mysql的文件的datedir目录为data文件夹下备份好的数据信息， 安装数据库服务
+
+安装 tomcat服务，安装eslworking服务
+
+读config文件，门店号、客户门店号、门店名，组成sql语句
+
+执行data下的sql语句
+
+修改eslworking配置中的url地址
+
+修改integration配置中的store信息
+
+启动eslworking\tomcat\integration

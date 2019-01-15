@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -247,8 +248,9 @@ public class FileUtils {
 		}
 		Properties prop = new Properties();
 		Map<String, String> map = new HashMap<>();
-		try(InputStream inputStream = new FileInputStream(propertiesFile)) {
-			prop.load(inputStream);
+		try(InputStream inputStream = new FileInputStream(propertiesFile);
+				InputStreamReader reader = new InputStreamReader(inputStream, "utf-8")) {
+			prop.load(reader);
 			for(Object key : prop.keySet()) {
 				map.put((String)key, prop.getProperty((String)key));
 			}

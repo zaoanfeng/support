@@ -76,8 +76,25 @@ public class SystemCmdManager {
 	 */
 	public boolean install(String windowsFile, String linuxFile, String serviceName, int timeout)
 			throws IOException, InterruptedException, TimeoutException {
+		return install(windowsFile, linuxFile, serviceName, "", timeout);
+	}
+	
+	/**
+	 * 安装服务
+	 * 
+	 * @param windowsFile windows下安装服务用到的文件
+	 * @param linuxFile   linux下安装服务用到的文件
+	 * @param serviceName 服务名
+	 * @param timeout     服务安装等待最大时间（秒）
+	 * @return
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 */
+	public boolean install(String windowsFile, String linuxFile, String serviceName, String displayName, int timeout)
+			throws IOException, InterruptedException, TimeoutException {
 		if (System.getProperty("os.name").toLowerCase().startsWith("window")) {
-			return installOfWindows(windowsFile, serviceName, timeout);
+			return installOfWindows(windowsFile, serviceName, displayName, timeout);
 		} else {
 			return installOfLinux(linuxFile, serviceName, timeout);
 		}
@@ -192,27 +209,31 @@ public class SystemCmdManager {
 	 * @throws TimeoutException
 	 */
 	private boolean startOfWindows(String serviceName, int timeout) throws IOException, InterruptedException, TimeoutException {
-		Process process = Runtime.getRuntime().exec("net start " + serviceName.trim());
-		Worker worker = new Worker(process);
-		worker.start();
-		try {
-			worker.join(timeout * SECOND);
-			if (worker.exit != null) {
-				int value = worker.exit;
-				if (value == 0) {
-					return true;
+		if (!statusOfWindows(serviceName)) {
+			Process process = Runtime.getRuntime().exec("net start " + serviceName.trim());
+			Worker worker = new Worker(process);
+			worker.start();
+			try {
+				worker.join(timeout * SECOND);
+				if (worker.exit != null) {
+					int value = worker.exit;
+					if (value == 0) {
+						return true;
+					} else {
+						return false;
+					}
 				} else {
-					return false;
+					throw new TimeoutException();
 				}
-			} else {
-				throw new TimeoutException();
+			} catch (InterruptedException ex) {
+				worker.interrupt();
+				Thread.currentThread().interrupt();
+				throw ex;
+			} finally {
+				process.destroy();
 			}
-		} catch (InterruptedException ex) {
-			worker.interrupt();
-			Thread.currentThread().interrupt();
-			throw ex;
-		} finally {
-			process.destroy();
+		} else {
+			return true;
 		}
 	}
 
@@ -277,11 +298,11 @@ public class SystemCmdManager {
 	 * @throws InterruptedException
 	 * @throws TimeoutException
 	 */
-	private boolean installOfWindows(String exec, String serviceName, int timeout)
+	private boolean installOfWindows(String exec, String serviceName, String displayName, int timeout)
 			throws IOException, InterruptedException, TimeoutException {
 		String path = exec.substring(0, exec.lastIndexOf(File.separator));
 		String cmd = exec.substring(exec.lastIndexOf(File.separator) + 1);
-		Process process = Runtime.getRuntime().exec("cmd /c " + cmd + " install " + serviceName.trim(), null, new File(path));
+		Process process = Runtime.getRuntime().exec("cmd /c " + cmd + " install " + serviceName.trim() + " " + displayName, null, new File(path));
 		Worker worker = new Worker(process);
 		worker.start();
 		try {
@@ -318,7 +339,7 @@ public class SystemCmdManager {
 	 */
 	private boolean installOfLinux(String exec, String serviceName, int timeout)
 			throws IOException, InterruptedException, TimeoutException {
-		// linux下拷�? "sh", "-c", "/bin/cp /data1 /data2"
+		// linux下拷贝 "sh", "-c", "/bin/cp /data1 /data2"
 		String cmd[] = { "sh", "-c", "/bin/cp -f " + exec + " /etc/init.d/" + serviceName.trim(),
 				"chkconfig --add " + serviceName.trim(), "chkconfig --level 2345 " + serviceName.trim() + " on" };
 		Process process = Runtime.getRuntime().exec(cmd);
@@ -402,7 +423,12 @@ public class SystemCmdManager {
 	}
 
 	public boolean shell(String cmd, int timeout) throws IOException, InterruptedException, TimeoutException {
-		Process process = Runtime.getRuntime().exec(cmd);
+		Process process = null;
+		if (System.getProperty("os.name").toLowerCase().startsWith("window")) {
+			process = Runtime.getRuntime().exec("cmd /c start " + cmd);
+		} else {
+			process = Runtime.getRuntime().exec(cmd);
+		}
 		Worker worker = new Worker(process);
 		worker.start();
 		try {
