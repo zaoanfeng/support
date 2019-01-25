@@ -14,7 +14,10 @@ public class SSH2Tools implements AutoCloseable{
 	
 	private SSHClient ssh;
 	private Session session;
-	
+	private String host;
+	private int port;
+	private String username;
+	private String password;
 	
 	public SSH2Tools() {
 		
@@ -32,9 +35,13 @@ public class SSH2Tools implements AutoCloseable{
 	public SSH2Tools connect(String host, int port, String username, String password) throws IOException {
 		
         try {
+        	this.host = host;
+        	this.port = port;
+        	this.username = username;
+        	this.password = password;
         	ssh = new SSHClient();
         	ssh.addHostKeyVerifier(new PromiscuousVerifier());
-            //ssh.loadKnownHosts();
+            ssh.loadKnownHosts();
 			ssh.connect(host, port);
 			ssh.authPassword(username, password);
 		} catch (IOException e) {
@@ -45,6 +52,31 @@ public class SSH2Tools implements AutoCloseable{
 			throw e;
 		}  
         return this;
+	}
+	
+	public boolean reconnect() throws Exception {
+		int retryTime = 5;
+		for(int i=0; i<retryTime; i++) {
+	        try {
+	        	Thread.sleep(60 * 1000);
+        		ssh = new SSHClient();
+            	ssh.addHostKeyVerifier(new PromiscuousVerifier());
+                //ssh.loadKnownHosts();
+    			ssh.connect(host, port);
+    			ssh.authPassword(username, password);
+    			return true;	
+			} catch (IOException | InterruptedException e) {
+				if (i >= retryTime - 1) {
+					e.printStackTrace();
+					throw e;
+				} 
+				if (ssh != null) {
+					ssh.close();
+				}		
+			}  
+        
+		}
+		return false;
 	}
 	
 	public void disconnect() throws IOException {

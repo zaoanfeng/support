@@ -1,8 +1,6 @@
 package com.hanshow.support.install;
 
-import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @SpringBootApplication
 public class Application {
@@ -10,7 +8,6 @@ public class Application {
 	private static final String INSTALL = "install", UNINSTALL = "uninstall", START = "start", STOP = "stop";
 	
 	public static void main(String[] args) {
-		//new SpringApplicationBuilder().sources(Application.class).web(WebApplicationType.NONE).run();
 		if (args.length <=0) {
 			System.out.println("Please input args");
 			System.exit(0);

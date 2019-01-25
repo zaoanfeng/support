@@ -80,6 +80,10 @@ public class Config {
 	 * @return String
 	 */
 	public String[] getStringArray(String key) {
-		return properties.getString(key).split(",");
+		String[] strs = properties.getString(key).split(",");
+		for (int i = 0; i < strs.length; i++) {
+			strs[i] = strs[i].trim();
+		}
+		return strs;
 	}
 }

@@ -424,8 +424,9 @@ public class SystemCmdManager {
 
 	public boolean shell(String cmd, int timeout) throws IOException, InterruptedException, TimeoutException {
 		Process process = null;
+		System.out.println(cmd);
 		if (System.getProperty("os.name").toLowerCase().startsWith("window")) {
-			process = Runtime.getRuntime().exec("cmd /c start " + cmd);
+			process = Runtime.getRuntime().exec("cmd /c " + cmd);
 		} else {
 			process = Runtime.getRuntime().exec(cmd);
 		}

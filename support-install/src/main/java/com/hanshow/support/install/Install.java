@@ -85,7 +85,7 @@ public class Install extends Base {
 			System.err.println(e);
 		}
 		// TODO 启动服务
-		startService();
+		//startService();
 		
 		System.out.println("System install finished!!!");
 	}
@@ -108,6 +108,7 @@ public class Install extends Base {
 		Wini ini = new Wini(new File(MYSQL_HOME, "my.ini"));
 		ini.getConfig().setLineSeparator("\n");
         ini.put("mysqld", "datadir", (MYSQL_HOME + File.separator + "Data").replaceAll("\\\\", "/"));
+        ini.put("mysqld", "secure-file-priv", "\"" +(MYSQL_HOME + File.separator + "Uploads\"").replaceAll("\\\\", "/"));
         ini.store();
 	}
 	
@@ -248,6 +249,7 @@ public class Install extends Base {
 		config.put("storeName", config.getOrDefault("storeName", "store1"));
 		config.put("storeIpAddress", config.getOrDefault("eslworkingUrl", "http://127.0.0.1:9000"));
 		config.put("shopwebName", config.getOrDefault("shopwebName", "shopweb"));
+		config.put("shopwebPort", config.getOrDefault("shopwebPort", "8080"));
 		//从Shopweb配置中读取mysql连接信息 
 		Map<String, String> shopwebConfig = FileUtils.readProperties(new File(TOMCAT_HOME, "webapps/" + config.get("shopwebName") + "/WEB-INF/classes/config.properties"));
 		DBUtils dbUtils = new DBUtils(shopwebConfig.get("db.url"), shopwebConfig.get("db.username"), shopwebConfig.get("db.password"));
@@ -278,7 +280,7 @@ public class Install extends Base {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("api1.uplink.url=")) {
-					content += "api1.uplink.url=" + "http://localhost:8080/shopweb-webapps/" + config.get("storeCode") + "/stationHandler" + "\n";
+					content += "api1.uplink.url=" + "http://127.0.0.1:" + config.get("shopwebPort") + "/" + config.get("shopwebName") + "/" + config.get("storeCode") + "/stationHandler" + "\n";
 				} else {
 					content += line + "\n";
 				}
