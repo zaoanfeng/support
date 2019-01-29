@@ -112,46 +112,53 @@ public class Location {
 			}
 		}
 		// 迁移mysql数据
-		try {
-			// 导出
-			DBUtils dbUtils = new DBUtils(Config.getInstance().getString("production.shopweb.db.url"), Config.getInstance().getString("production.shopweb.db.username"), Config.getInstance().getString("production.shopweb.db.password"));
-			File backupFile = new File(System.getProperty("user.dir") + File.separator + "backup.sql");
-			dbUtils.backupMysql(Config.getInstance().getStringArray("shopweb.tables"), backupFile);
-			// 导入
-			dbUtils = new DBUtils(Config.getInstance().getString("test.shopweb.db.url"), Config.getInstance().getString("test.shopweb.db.username"), Config.getInstance().getString("test.shopweb.db.password"));
-			try (BufferedReader br = new BufferedReader(new FileReader(backupFile))) {
-				String line;
-				List<String> list = new ArrayList<>();
-				while ((line = br.readLine()) != null) {
-					if (list.size() == 1000) {
-						dbUtils.execute(list.toArray(new String[] {}));
-						list.clear();
-					} else {
-						list.add(line);
-					}	
-				}
-				dbUtils.execute(list.toArray(new String[] {}));
-			}		
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
-		
+		if (Config.getInstance().getBoolean("shopweb.db.copy.enable")) {
+			try {
+				// 导出
+				DBUtils dbUtils = new DBUtils(Config.getInstance().getString("production.shopweb.db.url"), Config.getInstance().getString("production.shopweb.db.username"), Config.getInstance().getString("production.shopweb.db.password"));
+				File backupFile = new File(System.getProperty("user.dir") + File.separator + "backup.sql");
+				dbUtils.backupMysql(Config.getInstance().getStringArray("shopweb.tables"), backupFile);
+				// 导入
+				dbUtils = new DBUtils(Config.getInstance().getString("test.shopweb.db.url"), Config.getInstance().getString("test.shopweb.db.username"), Config.getInstance().getString("test.shopweb.db.password"));
+				try (BufferedReader br = new BufferedReader(new FileReader(backupFile))) {
+					String line;
+					List<String> list = new ArrayList<>();
+					while ((line = br.readLine()) != null) {
+						if (list.size() == 1000) {
+							dbUtils.execute(list.toArray(new String[] {}));
+							list.clear();
+						} else {
+							list.add(line);
+						}	
+					}
+					dbUtils.execute(list.toArray(new String[] {}));
+				}		
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+		}		
 		// 获取远程信息
 		String host = Config.getInstance().getString("eslworking.remote.ip");
 		String user = Config.getInstance().getString("eslworking.remote.user");
 		String password = Config.getInstance().getString("eslworking.remote.password");
 		String port = Config.getInstance().getString("eslworking.remote.port");
 		try(SSH2Tools ssh = new SSH2Tools().connect(host, Integer.valueOf((port == null || port.isEmpty()) ?"22" : port), user, password)) {		
-			//关闭远程服务系统
-			ssh.shell(Config.getInstance().getString("eslworking.remote.service.stop.script"));
-			logger.info( Config.getInstance().getString("eslworking.remote.service" + " is stoped!!!"));
-			// 删除远程数据库文件
-			ssh.shell("rm -rf " + Config.getInstance().getString("eslworking.remote.db.path") + "/*");
-			// 将本地的数据库拷贝到远程上
-			ssh.scpFileToRemote(Config.getInstance().getString("eslworking.local.db.path"), Config.getInstance().getString("eslworking.remote.db.path"));
-	    	// 启动远程服务
-			ssh.shell(Config.getInstance().getString("eslworking.remote.service.start.script"));
-	    	logger.info( Config.getInstance().getString("eslworking.remote.service" + " is started!!!"));
+			if (Config.getInstance().getBoolean("eslworking.remote.restart.enable")) {
+				//关闭远程服务系统
+				ssh.shell(Config.getInstance().getString("eslworking.remote.service.stop.script"));
+				logger.info( Config.getInstance().getString("eslworking.remote.service" + " is stoped!!!"));
+			}
+			if (Config.getInstance().getBoolean("eslworking.db.copy.enable")) {
+				// 删除远程数据库文件
+				ssh.shell("rm -rf " + Config.getInstance().getString("eslworking.remote.db.path") + "/*");
+				// 将本地的数据库拷贝到远程上
+				ssh.scpFileToRemote(Config.getInstance().getString("eslworking.local.db.path"), Config.getInstance().getString("eslworking.remote.db.path"));
+			}
+			if (Config.getInstance().getBoolean("eslworking.remote.restart.enable")) {
+				// 启动远程服务
+				ssh.shell(Config.getInstance().getString("eslworking.remote.service.start.script"));
+				logger.info( Config.getInstance().getString("eslworking.remote.service" + " is started!!!"));
+			}
 		} catch (Exception e) {
 			throw e;
 		}
@@ -164,11 +171,13 @@ public class Location {
 		String password = Config.getInstance().getString("eslworking.remote.password");
 		String port = Config.getInstance().getString("eslworking.remote.port");
 		// 关闭远程服务
-		try(SSH2Tools ssh = new SSH2Tools().connect(host, Integer.valueOf((port == null || port.isEmpty()) ?"22" : port), user, password)) {		
-	    	ssh.shell(Config.getInstance().getString("eslworking.remote.service.stop.script"));
-	    	logger.info( Config.getInstance().getString("eslworking.remote.service" + " is stoped!!!"));
-		} catch (Exception e) {
-			throw e;
+		if (Config.getInstance().getBoolean("eslworking.remote.restart.enable")) {
+			try(SSH2Tools ssh = new SSH2Tools().connect(host, Integer.valueOf((port == null || port.isEmpty()) ?"22" : port), user, password)) {		
+		    	ssh.shell(Config.getInstance().getString("eslworking.remote.service.stop.script"));
+		    	logger.info( Config.getInstance().getString("eslworking.remote.service" + " is stoped!!!"));
+			} catch (Exception e) {
+				throw e;
+			}
 		}
 		ApPcieConfig ap = new ApPcieConfig();
 		ap.setEslworkingIp(Config.getInstance().getString("ap.eslworking.ip"));
