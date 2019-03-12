@@ -76,23 +76,27 @@ public class LogAnalysis {
 			logger.error(e.getMessage(), e);
 		}
 		// 获取前一天的日志，并进行解析
-		File logFolder = new File(eslworkingPath + File.separator + "log");
-		if (new File(eslworkingPath).exists() && logFolder.exists() && logFolder.isDirectory()) {
-			
-			String logName = "eslworking_";		
+		File logFolder = new File(eslworkingPath, "log");
+		if (logFolder.exists() && logFolder.isDirectory()) {
+			String logName_prefix = "eslworking_";
+			String logName = "";
 			for (int i=0; i<=10; i++) {
 				if (i == 0) {
-					logName = logName + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + ".log.gz";
+					logName = logName_prefix + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + ".log.gz";
 				} else {
-					logName = logName + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + "-" + i + ".log.gz";
+					logName = logName_prefix + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + "-" + i + ".log.gz";
 				}
-				File logFile = new File(eslworkingPath + File.separator + "log" + File.separator + logName);
-				if (!logFile.exists()) {
-					break;
-				}
-				try {
 				
-					analysisLog(new File(logFolder, logName), storeCode);
+				File logFile = new File(logFolder, logName);
+				if (!logFile.exists()) {
+					if (i == 0) {
+						continue;
+					} else {
+						break;
+					}
+				}
+				try {		
+					analysisLog(logFile, storeCode);
 				} catch (Exception e) {
 					throw e;
 				}
@@ -207,11 +211,11 @@ public class LogAnalysis {
 		receiveService.deleteAll();
 		networkAnalysisService.deleteAll();
 		String line = null;
-		try (GZIPInputStream inputStream = new GZIPInputStream(new FileInputStream(file))) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		try (GZIPInputStream inputStream = new GZIPInputStream(new FileInputStream(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             while ((line = reader.readLine()) != null) {
             	//各种类型的打包数据（清屏、更新、查询、组网）
-                if (line.contains("category=esl,action=session_created") && line.contains("result=success")) {
+                if (line.contains("category=esl,action=session_created") && line.contains("result=success") && line.contains("UPDATE")) {
                     Map<String, Object> record = parseRecord(line);
                     DiskAnalysis analysis = new DiskAnalysis();
                     analysis.setLogTime(DATE_FORMAT.parse(record.get("log_time").toString()));
@@ -222,7 +226,7 @@ public class LogAnalysis {
                     analysis.setRetryTimes(Byte.valueOf(record.get("payload_retry_time").toString()));
                     analysis.setSpentTime(Long.valueOf(record.get("time").toString()));
                     diskAnalysisService.insert(analysis);      
-                } else if (line.contains("category=esl,action=receive")) {
+                } else if (line.contains("category=esl,action=receive") && line.contains("UPDATE")) {
                 	//接收任务
                 	Map<String, Object> record = parseRecord(line);
                 	Receive receive = new Receive();

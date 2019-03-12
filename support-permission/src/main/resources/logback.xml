@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="60 seconds" debug="true">
+    <!-- 定义日志的根目录 -->
+    <property name="LOG_HOME" value="logs" />
+    <property name="patternLayout" value="%d{yy/MM/dd HH:mm:ss:SSS} [%-5p] [%-18t] %m%n"/>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${patternLayout}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- 监控数据日志 -->
+    <appender name="coreLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 指定日志文件的名称 -->
+        <file>${LOG_HOME}/support.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/support-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <MaxHistory>3</MaxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${patternLayout}</pattern>
+        </encoder>
+    </appender>
+    
+    <root level="DEBUG">
+        <appender-ref ref="stdout" />
+        <appender-ref ref="coreLogAppender" />
+    </root>
+    <logger name="com.hanshow.support.permission.mapper" level="DEBUG" additivity="FALSE">
+    </logger>
+</configuration> 

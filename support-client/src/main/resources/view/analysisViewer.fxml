@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.GridPane?>
 
-<AnchorPane fx:id="ap" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanshow.monitor.gui.AnalysisViewerController">
+<AnchorPane fx:id="ap" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanshow.support.monitor.gui.AnalysisViewerController">
    <children>
       <Button fx:id="forward" layoutX="525.0" layoutY="363.0" mnemonicParsing="false" onAction="#forward" text="下一步" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="30.0" />
       <GridPane layoutX="90.0" layoutY="152.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0">

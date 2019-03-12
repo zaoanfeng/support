@@ -16,3 +16,6 @@ include 'services:webservice'
 */
 
 rootProject.name = 'support-server'
+
+include ':support-core'
+project(':support-core').projectDir = new File(settingsDir, '../support-core')

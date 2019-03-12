@@ -140,6 +140,7 @@ public class Install extends Base {
 				content += (line + "\n");
 				if (line.equals("setlocal")) {
 					content += ("\nset JRE_HOME=" + JAVA_HOME + File.separator + "jre" + "\n");
+					content += ("\nset CATALINA_HOME=" + TOMCAT_HOME + "\n");
 				}
 			}
 			writer.write(content);
