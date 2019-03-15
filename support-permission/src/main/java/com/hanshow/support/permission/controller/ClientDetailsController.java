@@ -16,8 +16,8 @@ import com.hanshow.support.permission.model.ClientDetails;
 import com.hanshow.support.permission.service.ClientDetailsService;
 
 @RestController
-@RequestMapping("/client")
-public class ClientDetailsController {
+@RequestMapping("/clients")
+public class ClientDetailsController  {
 
 	@Autowired
 	private ClientDetailsService clientDetailsService;

@@ -11,7 +11,7 @@ import com.hanshow.support.model.DiskAnalysis;
 import com.hanshow.support.service.DiskAnalysisService;
 
 @Service
-public class DiskAnalysisServiceImpl extends BaseServiceImpl<DiskAnalysis, Long, DiskAnalysisRepository>implements DiskAnalysisService {
+public class DiskAnalysisServiceImpl extends BaseServiceImpl<DiskAnalysis, Long> implements DiskAnalysisService {
 
 	@Autowired
 	private DiskAnalysisRepository analysisRepository;

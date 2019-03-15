@@ -128,26 +128,14 @@ table {
         <th scope="col">${translate.store.code}</th>
         <th scope="col">${translate.store.name}</th>     
         <th scope="col">${translate.mail.disk_status}</th>
-        <th scope="col">${translate.mail.disk_package_amount}(${translate.level.small})</th>
-        <th scope="col">${translate.mail.disk_package_amount}(${translate.level.middle})</th>
-        <th scope="col">${translate.mail.disk_package_amount}(${translate.level.large})</th>
+        <th scope="col">${translate.mail.disk_package_amount}</th>
       </tr>
     </thead>
     <tr valign="top">
 	  <td>${result.store.code}</td>
 	  <td>${result.store.name}</td>
-	  #if ($result.disk.status == 1)
       <td>${translate.level.warning}</td>
-      #end
-      #if ($result.disk.status == 2)
-      <td>${translate.level.serious}</td>
-      #end
-      #if ($result.disk.status == 3)
-      <td>${translate.level.collapse}</td>
-      #end
-      <td>${result.disk.packageAmount.s}</td>
-      <td>${result.disk.packageAmount.m}</td>
-      <td>${result.disk.packageAmount.l}</td>
+      <td>${result.disk.packageAmount}</td>
     </tr>
   </table>
 </div>
@@ -168,17 +156,33 @@ table {
     <tr valign="top">
 	  <td>${result.store.code}</td>
 	  <td>${result.store.name}</td>
-      #if ($result.network.status == 1)
       <td>${translate.level.warning}</td>
-      #end
-      #if ($result.network.status == 2)
-      <td>${translate.level.serious}</td>
-      #end
-      #if ($result.network.status == 3)
-      <td>${translate.level.collapse}</td>
-      #end
-      <td>${result.network.packageAmount.s}%</td>
+      <td>${result.network.packageAmount}%</td>
     </tr>
+  </table>
+</div>
+#end
+
+#if ($result.ap)
+<div>
+  <h1>${translate.mail.ap.offline}</h1>
+  <table class="bordered">
+    <thead>
+      <tr>
+        <th scope="col">${translate.store.code}</th>
+        <th scope="col">${translate.store.name}</th>
+        <th scope="col">${translate.mail.ap.apid}</th>
+        <th scope="col">${translate.mail.ap.amount}</th>
+      </tr>
+    </thead>
+    #foreach ($ap in $!result.ap)
+    <tr valign="top">
+	  <td>${result.store.code}</td>
+	  <td>${result.store.name}</td>
+      <td>${ap.apId}</td>
+      <td>${ap.amount}</td>
+    </tr>
+    #end
   </table>
 </div>
 #end

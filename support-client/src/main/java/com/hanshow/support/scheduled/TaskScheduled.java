@@ -28,7 +28,9 @@ import com.alibaba.fastjson.JSONException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hanshow.support.SpringUtil;
 import com.hanshow.support.analysis.LogAnalysis;
+import com.hanshow.support.analysis.RealTimeLogAnalysis;
 import com.hanshow.support.mail.Mail;
+import com.hanshow.support.model.ApRecord;
 import com.hanshow.support.model.Store;
 import com.hanshow.support.monitor.Config;
 import com.hanshow.support.monitor.Monitor;
@@ -44,6 +46,8 @@ public class TaskScheduled {
 
 	@Autowired
 	private LogAnalysis diskAnalysis;
+	@Autowired
+	private RealTimeLogAnalysis realTimeLogAnalysis;
 	private Monitor monitor = new Monitor();
 	private Calendar lastActiveTime;
 	Map<String, Object> translateMap = null;
@@ -57,7 +61,7 @@ public class TaskScheduled {
 			@Override
 			public void run() {
 				// 监控服务是否正常运行
-				 Store store = new Store(Config.getInstance().getString("user.store.code"), Config.getInstance().getString("user.store.name"));
+				Store store = new Store(Config.getInstance().getString("user.store.code"), Config.getInstance().getString("user.store.name"));
 				
 				String checkTime = Config.getInstance().getString("disk.check.time");
 				if (!checkTime.equals("")) {
@@ -72,11 +76,11 @@ public class TaskScheduled {
 						// 到达时间执行一次查询，一天只执行一次
 						c.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
 						List<AnalysisStatus> analysisStatusList = null;
-						if (c.after(lastActiveTime) && c.before(now)) {
+						//if (c.after(lastActiveTime) && c.before(now)) {
 							analysisStatusList = diskAnalysis.exec();
-						lastActiveTime = Calendar.getInstance();
-						}
-						sendMail(monitor.serviceMonitor(), analysisStatusList, store);
+							lastActiveTime = Calendar.getInstance();
+						//}
+						sendMail(monitor.serviceMonitor(), analysisStatusList, realTimeLogAnalysis.exec(), store);
 					} catch (Exception e) {
 						logger.error(e.getMessage(), e);
 					}
@@ -97,7 +101,7 @@ public class TaskScheduled {
 	 * @throws URISyntaxException
 	 */
 	@SuppressWarnings("unchecked")
-	private void sendMail(List<ServiceStatus> serviceStatusList, List<AnalysisStatus> analysisStatusList, Store store)
+	private void sendMail(List<ServiceStatus> serviceStatusList, List<AnalysisStatus> analysisStatusList, List<ApRecord> apRecords, Store store)
 			throws JSONException, IOException, EmailException, URISyntaxException {
 		if ((Config.getInstance().getBoolean("mail.enable").booleanValue())
 				&& (((serviceStatusList != null) && (serviceStatusList.size() > 0))
@@ -118,6 +122,7 @@ public class TaskScheduled {
 					}
 				}
 			}
+			map.put("ap", apRecords);
 			String mailTitle = ((Map<String, String>)this.translateMap.get("mail")).get("title") + "-" + store.getName() + "(" + store.getCode() + ")";
 			Template template = Mail.loadTemplate("vm/MailBody.vm");
 			Mail.sendHtml(mailTitle, map, template, this.translateMap,

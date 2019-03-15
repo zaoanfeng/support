@@ -4,9 +4,13 @@ spring:
         driver-class-name: org.h2.Driver #配置JDBC Driver
         username: hanshow #配置数据库用户名
         password: hanshow #配置数据库密码
-        schema: classpath:db/schema.sql
+        # schema: classpath:db/schema.sql
     output: 
         ansi: 
             enabled: ALWAYS
+    jpa: 
+        show-sql: false
+        hibernate: 
+            ddl-auto: update
 server:
     port: 8888

@@ -16,3 +16,4 @@ support-server/.gradle/
 support-server/bin/
 support-server/gradle/
 *.class
+support-client/build

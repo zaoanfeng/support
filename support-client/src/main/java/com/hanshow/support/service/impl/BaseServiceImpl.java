@@ -10,7 +10,7 @@ import org.springframework.data.domain.Example;
 import com.hanshow.support.dao.BaseRepository;
 import com.hanshow.support.service.BaseService;
 
-public class BaseServiceImpl<T, ID extends Serializable, R extends BaseRepository<T, ID>> implements BaseService<T, ID, R> {
+public class BaseServiceImpl<T, ID extends Serializable> implements BaseService<T, ID> {
 
 	@Autowired
 	private BaseRepository<T, ID> baseRepository;
@@ -19,6 +19,7 @@ public class BaseServiceImpl<T, ID extends Serializable, R extends BaseRepositor
 	public boolean insert(T t) throws SQLException {
 		if (t != null) {
 			baseRepository.save(t);
+			return true;
 		}
 		return false;
 	}

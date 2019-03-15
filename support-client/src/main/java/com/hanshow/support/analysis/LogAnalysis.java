@@ -63,6 +63,7 @@ public class LogAnalysis {
 			logger.error("Can not found config.properties file");
 			return null;
 		}
+		
 		//从api1.uplink.url中读取配置访问shopweb的url，从中截取storeCode
 		String storeCode = null;
 		Properties properties = new Properties();
@@ -126,9 +127,10 @@ public class LogAnalysis {
 			logger.info("ap connection timeout rate = " + (int)result);
 			if (result > Config.getInstance().getInt("ap.ack.timeout.rate")) {
 				status = new NetworkAnalysisStatus();
-		        status.setPackageAmount(AnalysisStatus.SMALL, (int)result);
+		        status.setPackageAmount((int)result);
 		        status.setStatus(AnalysisStatus.WARNING);	
-		}} else {
+			}
+		} else {
 			logger.info("ap connection timeout rate non-statistics");
 		}
 		return status;
@@ -141,61 +143,21 @@ public class LogAnalysis {
 	 */
 	private DiskAnalysisStatus analysisDisk() throws EmailException {
 		DiskAnalysisStatus status = new DiskAnalysisStatus();
-		Integer packageSizeSmall = Config.getInstance().getInt("package.size.small");
-		Integer packageSizeLarge = Config.getInstance().getInt("package.size.large");
-		Integer packageSizeSmallRate = Config.getInstance().getInt("package.size.small.rate");
-		Integer packageSizeMiddleRate = Config.getInstance().getInt("package.size.middle.rate");
-		Integer packageSizeLargeRate = Config.getInstance().getInt("package.size.large.rate");
-		DiskAnalysis small = diskAnalysisService.queryAllByFrameSizeAndTypeIsUpdateGroupBy(0, packageSizeSmall);
-		DiskAnalysis middle = diskAnalysisService.queryAllByFrameSizeAndTypeIsUpdateGroupBy(packageSizeSmall, packageSizeLarge);
-		DiskAnalysis large = diskAnalysisService.queryAllByFrameSizeAndTypeIsUpdateGroupBy(packageSizeLarge, Integer.MAX_VALUE);
-		int level = 0;
-		// 计算小包每小时的打包数量
-		if (small != null && small.getSpentTime() > 0 && small.getEslCount() > 0) {
-			int smallRate = (int)(HOUR / ((double)small.getSpentTime() / small.getEslCount()));
-			logger.info("package size small rate = " + smallRate);
-			status.setPackageAmount(AnalysisStatus.SMALL, smallRate);
-			if (smallRate < packageSizeSmallRate) {
-				level ++;
-			}
-		} else {
-			logger.info("package size small rate non-statistics");
-		}
-		// 计算中包每小时的打包数量
-		if (middle != null && middle.getSpentTime() > 0 && middle.getEslCount() > 0) {
-			int middleRate = (int)(HOUR / ((double)middle.getSpentTime() / middle.getEslCount()));
-			logger.info("package size middle rate = " + middleRate);
-			status.setPackageAmount(AnalysisStatus.MIDDLE, middleRate);
-			if (middleRate < packageSizeMiddleRate) {
-				level ++;
-			}
+
+		Integer packageSizeRate = Config.getInstance().getInt("package.size.rate");
+		DiskAnalysis packSize = diskAnalysisService.queryAllByFrameSizeAndTypeIsUpdateGroupBy(0, Integer.MAX_VALUE);
+
+		// 计算每小时的打包数量
+		if (packSize != null && packSize.getSpentTime() > 0 && packSize.getEslCount() > 0) {
+			int rate = (int)(HOUR / ((double)packSize.getSpentTime() / packSize.getEslCount()));
+			logger.info("package size middle rate = " + rate);
+			status.setPackageAmount(rate);
+			if (rate < packageSizeRate) {
+				status.setStatus(AnalysisStatus.WARNING);
+			} 
 		}else {
 			logger.info("package size middle rate non-statistics");
 		}
-		// 计算大包每小时的打包数量
-		if (large != null && large.getSpentTime() > 0 && large.getEslCount() > 0 ) { 
-			int largeRate = (int)(HOUR / ((double)large.getSpentTime() / large.getEslCount() ));
-			logger.info("package size large rate = " + largeRate);
-			status.setPackageAmount(AnalysisStatus.LARGE, largeRate);
-			if (largeRate < packageSizeLargeRate) {
-				level ++;
-			}
-		} else {
-			logger.info("package size large rate non-statistics");
-		}
-		switch (level) {
-		    case 3: 
-		    	status.setStatus(AnalysisStatus.COLLAPSE);
-		    	break;
-		    case 2: 
-		    	status.setStatus(AnalysisStatus.SERIOUS);
-		    	break;
-		    case 1: 
-		    	status.setStatus(AnalysisStatus.WARNING);
-		    	break;
-		    default: 
-		      status.setStatus(AnalysisStatus.NORMAL);
-	    }
 	    return status;
 	}
 	

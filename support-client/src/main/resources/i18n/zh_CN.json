@@ -16,7 +16,12 @@
 		"disk_status": "磁盘状态",
 		"disk_package_amount": "每小时打包数量",
 		"network_status": "网络状态",
-	 	"network_lost_package_rate": "网络丢包率(百分比)"
+        "network_lost_package_rate": "网络丢包率(百分比)",
+        "ap": {
+            "offline": "AP掉线",
+            "apid": "基站编号",
+            "amount": "掉线次数"
+        }
 	},
 	"level": {
 		"small": "小",

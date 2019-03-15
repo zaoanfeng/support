@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.hanshow.support.permission.dao.BaseRepository;
 import com.hanshow.support.permission.service.BaseService;
@@ -81,6 +83,17 @@ public class BaseServiceImpl<T, ID extends Serializable> implements BaseService<
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public Page<T> queryForPage(int page, int size) {	
+		return baseRepository.findAll(PageRequest.of(page, size));
+	}
+
+	@Override
+	public Page<T> queryForPage(T t, int page, int size) {
+		// TODO Auto-generated method stub
+		return baseRepository.findAll(Example.of(t), PageRequest.of(page, size));
 	}
 
 }

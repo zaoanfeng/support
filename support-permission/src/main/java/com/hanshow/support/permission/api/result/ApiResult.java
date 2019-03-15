@@ -9,9 +9,9 @@ public class ApiResult implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int code;
+	protected int code;
 	
-	private String message;
+	protected String message;
 	
 	public ApiResult(Status status) {
 		this.code = status.getCode();

@@ -9,7 +9,7 @@ import com.hanshow.support.model.Store;
 import com.hanshow.support.service.StoreService;
 
 @Service
-public class StoreServiceImpl extends BaseServiceImpl<Store, Integer, StoreRepository>implements StoreService {
+public class StoreServiceImpl extends BaseServiceImpl<Store, Integer>implements StoreService {
 
 	@Autowired
 	private StoreRepository storeRepository;

@@ -3,7 +3,7 @@ package com.hanshow.support.service;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface BaseService<T, ID, R> {
+public interface BaseService<T, ID> {
 
 	boolean insert(T t) throws SQLException;
 	

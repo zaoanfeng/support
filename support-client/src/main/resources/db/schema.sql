@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `disk_analysis` (
-	`id` Integer PRIMARY KEY NOT NULL,
+	`id` INTEGER PRIMARY KEY NOT NULL,
 	`log_time` DATETIME NOT NULL,
 	`store_code` int NOT NULL,
 	`esl_id` VARCHAR(32) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `disk_analysis` (
 );
 
 CREATE TABLE IF NOT EXISTS `receive` (
-	`id` Integer PRIMARY KEY NOT NULL,
+	`id` INTEGER PRIMARY KEY NOT NULL,
     `store_code` INTEGER NOT NULL,
     `log_time` DATETIME NOT NULL,
     `esl_id` VARCHAR(32) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `receive` (
 );
 
 CREATE TABLE IF NOT EXISTS `network_analysis` (
-	`id` Integer PRIMARY KEY NOT NULL,
+	`id` INTEGER PRIMARY KEY NOT NULL,
     `store_code` INTEGER NOT NULL,
     `log_time` DATETIME NOT NULL,
     `esl_id` VARCHAR(32) NOT NULL,
@@ -27,3 +27,22 @@ CREATE TABLE IF NOT EXISTS `network_analysis` (
     `ap_id` INTEGER NOT NULL,
     `task_id` BIGINT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS `ap_record` (
+	`id` INTEGER PRIMARY KEY NOT NULL,
+	`ap_id` Integer NOT NULL,
+	`ap_mac` VARCHAR(32) NOT NULL,
+	`ap_ip`  VARCHAR(32) NOT NULL,
+	`log_time` DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `config` (
+	`id` INTEGER PRIMARY KEY NOT NULL,
+	`position` BIGINT NOT NULL,
+	`update_time` DATETIME NOT NULL
+)
+
+
+
+
+

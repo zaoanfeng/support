@@ -1,9 +1,8 @@
 package com.hanshow.support.service;
 
-import com.hanshow.support.dao.StoreRepository;
 import com.hanshow.support.model.Store;
 
-public interface StoreService extends BaseService<Store, Integer, StoreRepository> {
+public interface StoreService extends BaseService<Store, Integer> {
 
 	Store query(Integer storeId);
 	
