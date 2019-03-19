@@ -76,10 +76,10 @@ public class TaskScheduled {
 						// 到达时间执行一次查询，一天只执行一次
 						c.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
 						List<AnalysisStatus> analysisStatusList = null;
-						//if (c.after(lastActiveTime) && c.before(now)) {
+						if (c.after(lastActiveTime) && c.before(now)) {
 							analysisStatusList = diskAnalysis.exec();
 							lastActiveTime = Calendar.getInstance();
-						//}
+						}
 						sendMail(monitor.serviceMonitor(), analysisStatusList, realTimeLogAnalysis.exec(), store);
 					} catch (Exception e) {
 						logger.error(e.getMessage(), e);
@@ -105,7 +105,8 @@ public class TaskScheduled {
 			throws JSONException, IOException, EmailException, URISyntaxException {
 		if ((Config.getInstance().getBoolean("mail.enable").booleanValue())
 				&& (((serviceStatusList != null) && (serviceStatusList.size() > 0))
-						|| ((analysisStatusList != null) && (analysisStatusList.size() > 0)))) {
+						|| ((analysisStatusList != null) && (analysisStatusList.size() > 0)))
+				|| ((apRecords != null) && (apRecords.size() > 0))) {
 			if (this.translateMap == null) {
 				this.translateMap = loadTranslate();
 			}

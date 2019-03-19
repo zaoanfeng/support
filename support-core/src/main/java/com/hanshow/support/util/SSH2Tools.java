@@ -41,7 +41,7 @@ public class SSH2Tools implements AutoCloseable{
         	this.password = password;
         	ssh = new SSHClient();
         	ssh.addHostKeyVerifier(new PromiscuousVerifier());
-            ssh.loadKnownHosts();
+            //ssh.loadKnownHosts();
 			ssh.connect(host, port);
 			ssh.authPassword(username, password);
 		} catch (IOException e) {
