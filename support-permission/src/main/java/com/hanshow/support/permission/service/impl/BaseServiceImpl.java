@@ -27,6 +27,24 @@ public class BaseServiceImpl<T, ID extends Serializable> implements BaseService<
 	}
 
 	@Override
+	public void deleteById(ID id) {
+		// TODO Auto-generated method stub
+		baseRepository.deleteById(id);
+	}
+	
+	@Override
+	public void delete(T t) {
+		// TODO Auto-generated method stub
+		baseRepository.delete(t);
+	}
+	
+	@Override
+	public void deleteAll() {
+		// TODO Auto-generated method stub
+		baseRepository.deleteAll();
+	}
+	
+	@Override
 	public boolean update(T t) throws SQLException {
 		// TODO Auto-generated method stub
 		return insert(t);
@@ -64,11 +82,10 @@ public class BaseServiceImpl<T, ID extends Serializable> implements BaseService<
 	public List<T> queryAll() {
 		return baseRepository.findAll();
 	}
-
+	
 	@Override
-	public void deleteAll() {
-		// TODO Auto-generated method stub
-		baseRepository.deleteAll();
+	public T queryById(ID id) {
+		return baseRepository.findById(id).get();
 	}
 
 	@Override

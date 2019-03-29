@@ -81,8 +81,8 @@ public class RealTimeLogAnalysis {
 			
 			long position = 0;
 			config.getPosition();
-			logger.info("position=" + config.getPosition());
-			logger.info("file.length()=" + file.length());
+			logger.debug("position=" + config.getPosition());
+			logger.debug("file.length()=" + file.length());
 			if(file.length() > config.getPosition()) {
 				position = config.getPosition();
 			}
@@ -91,8 +91,10 @@ public class RealTimeLogAnalysis {
 			String line = null;
 			JSONObject aps = null;
 			while((line = file.readLine()) != null) {
-				position += line.getBytes().length;
+				//存在换行字节数量的统计，无法累加
+				//position += (line.getBytes().length + 1);
 				if (line.indexOf("WARN") != -1 && line.indexOf("offline due to connection closed by peer") != -1) {
+					logger.info(line);
 					ApRecord record = new ApRecord();
 					record.setLogTime(sdf.parse(line.substring(0, 19)));
 					line = line.substring(line.indexOf("{") + 1, line.indexOf("}"));
@@ -130,25 +132,20 @@ public class RealTimeLogAnalysis {
 					}				
 					JSONArray array = aps.getJSONObject("ap_list").getJSONArray("g1");
 					for (int i = 0; i < array.size(); i++) {		
-						JSONObject ap = (JSONObject) array.get(i);	
-						logger.info("ap.get(ip) = " + ap.getString("ip"));
-						logger.info("record.getApIp() = " + record.getApIp());
+						JSONObject ap = (JSONObject) array.get(i);
 						if (ap.getString("ip").equals(record.getApIp())) {
 							record.setApId(ap.getInteger("id"));
 							record.setApMac(ap.getString("mac"));
-							logger.info("record = " + record.toString());
 							//插入数据库
 							apRecordService.insert(record);
 							flag = true;
 							break;
 						}
-					}
-					
+					}	
 				}
 			}
-
 			//更新文件读取标志
-			config.setPosition(position);
+			config.setPosition(file.length());
 			config.setCreateTime(new Date());
 			configService.insert(config);
 		} catch (Exception e) {
@@ -177,7 +174,6 @@ public class RealTimeLogAnalysis {
 				apList.add(ap);	
 			}
 		});
-		logger.info(apList.size() + "");
 		return apList;
 	}
 }

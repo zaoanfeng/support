@@ -16,3 +16,19 @@ security:
       userAuthorizationUri: http://localhost:8080/oauth/authorize
       clientId: 10086
       clientSecret: 123456
+
+#开发配置
+spring:
+    datasource:
+        url: jdbc:mysql://localhost:3306/support?serverTimezone=Asia/Shanghai&useSSL=false&useUnicode=true&characterEncoding=utf-8
+        username: root
+        password: admin
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa: 
+        show-sql: true
+        hibernate: 
+            ddl-auto: update
+    
+mybatis:
+  typeAliasesPackage: com.hanshow.support.server.model
+  mapperLocations: classpath:com.hanshow.support.server.mapper/*.xml

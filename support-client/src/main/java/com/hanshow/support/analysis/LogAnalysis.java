@@ -154,11 +154,12 @@ public class LogAnalysis {
 			status.setPackageAmount(rate);
 			if (rate < packageSizeRate) {
 				status.setStatus(AnalysisStatus.WARNING);
+				return status;
 			} 
 		}else {
 			logger.info("package size middle rate non-statistics");
 		}
-	    return status;
+	    return null;
 	}
 	
 	/**
