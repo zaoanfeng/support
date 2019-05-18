@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<configuration scan="true" scanPeriod="60 seconds" debug="true">
+<configuration scan="false" scanPeriod="60 seconds" debug="false">
     <!-- 定义日志的根目录 -->
     <property name="LOG_HOME" value="logs" />
     <property name="patternLayout" value="%d{yy/MM/dd HH:mm:ss:SSS} [%-5p] [%-18t] %m%n"/>

@@ -42,6 +42,7 @@ public class LogAnalysis {
     private final static Splitter BLANK_SPLITTER = Splitter.on(' ').trimResults();
     private final static Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
     private final static String DELIMETER = " INFO  - ";
+    private String ESLWORKING_LOG_SUFFIX = ".log.gz";
     private final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
     private final static SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final static Integer DAY = 24 * 60 * 60 * 1000, HOUR = 60 * 60 * 1000;
@@ -57,6 +58,10 @@ public class LogAnalysis {
 	public List<AnalysisStatus> exec() throws Exception {
 		// 获取eslworking路径
 		String eslworkingPath = Config.getInstance().getString("monitor.eslworking.path");
+		ESLWORKING_LOG_SUFFIX = Config.getInstance().getString("eslworking.log.suffix");
+		if (ESLWORKING_LOG_SUFFIX.isEmpty()) {
+			ESLWORKING_LOG_SUFFIX = ".log.gz";	
+		}
 		// 获取eslworking配置文件信息
 		File configFile = new File(eslworkingPath + File.separator + "config" + File.separator + "config.properties");
 		if (!configFile.exists()) {
@@ -83,9 +88,9 @@ public class LogAnalysis {
 			String logName = "";
 			for (int i=0; i<=10; i++) {
 				if (i == 0) {
-					logName = logName_prefix + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + ".log.gz";
+					logName = logName_prefix + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + ESLWORKING_LOG_SUFFIX;
 				} else {
-					logName = logName_prefix + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + "-" + i + ".log.gz";
+					logName = logName_prefix + DAY_FORMAT.format(new Date(new Date().getTime() - DAY)) + "-" + i + ESLWORKING_LOG_SUFFIX;
 				}
 				
 				File logFile = new File(logFolder, logName);

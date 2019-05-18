@@ -199,6 +199,7 @@ public class ApUpgrade {
 					while ((line = reader.readLine()) != null) {
 						if (line.trim().matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
 							Ap ap = new Ap(line.trim());
+							ap.setVersion("1.0.0");
 							apList.add(ap);
 						}
 					}

@@ -15,7 +15,6 @@ public class ApConfig {
 			new com.hanshow.support.upgrade.ap.Ap2Config().exec();
 		} else if (args[0].equals("pcie")) {
 			new com.hanshow.support.upgrade.ap.ApPcieConfig().exec();
-		}
-		
+		}	
 	}
 }

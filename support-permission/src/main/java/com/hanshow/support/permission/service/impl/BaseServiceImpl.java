@@ -3,6 +3,7 @@ package com.hanshow.support.permission.service.impl;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.hanshow.support.permission.dao.BaseRepository;
+import com.hanshow.support.permission.model.Pages;
 import com.hanshow.support.permission.service.BaseService;
 
 public class BaseServiceImpl<T, ID extends Serializable> implements BaseService<T, ID> {
@@ -26,6 +28,17 @@ public class BaseServiceImpl<T, ID extends Serializable> implements BaseService<
 		return false;
 	}
 
+	@Override
+	public boolean insert(List<T> list) throws SQLException {
+		// TODO Auto-generated method stub
+		if (list != null && !list.isEmpty()) {
+			List<T> result = new ArrayList<>();
+			list.forEach(t -> {result.add(baseRepository.save(t));});
+			return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public void deleteById(ID id) {
 		// TODO Auto-generated method stub
@@ -103,14 +116,24 @@ public class BaseServiceImpl<T, ID extends Serializable> implements BaseService<
 	}
 
 	@Override
-	public Page<T> queryForPage(int page, int size) {	
-		return baseRepository.findAll(PageRequest.of(page, size));
+	public Pages<T> queryForPage(int page, int size) {	
+		return queryForPage(null, page, size);
 	}
 
 	@Override
-	public Page<T> queryForPage(T t, int page, int size) {
-		// TODO Auto-generated method stub
-		return baseRepository.findAll(Example.of(t), PageRequest.of(page, size));
+	public Pages<T> queryForPage(T t, int page, int size) {
+		Page<T> result = null;
+		if (t == null) {
+			result = baseRepository.findAll(PageRequest.of(page, size));
+		} else {
+			result = baseRepository.findAll(Example.of(t), PageRequest.of(page, size));
+		}
+		Pages<T> pages = new Pages<T>();
+		pages.setPageNo(result.getNumberOfElements());
+		pages.setPageSize(result.getTotalPages());
+		pages.setRows(result.getContent());
+		pages.setTotal(result.getSize());
+		return pages;
 	}
 
 }

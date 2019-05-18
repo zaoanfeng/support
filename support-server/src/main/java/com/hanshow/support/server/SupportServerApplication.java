@@ -8,11 +8,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 
 @SpringBootApplication
 @EnableOAuth2Sso
+//@EnableTransactionManagement
 public class SupportServerApplication {
 
 	//private static final Logger logger = LoggerFactory.getLogger(Application.class);
-	
+
 	public static void main(String[] args) {
-		new SpringApplicationBuilder().sources(SupportServerApplication.class).web(WebApplicationType.SERVLET).run(args);		
+		new SpringApplicationBuilder().sources(SupportServerApplication.class).web(WebApplicationType.SERVLET).run(args);
 	}
 }

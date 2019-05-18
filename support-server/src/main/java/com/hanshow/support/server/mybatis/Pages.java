@@ -4,41 +4,42 @@ import java.util.List;
 
 public class Pages<T> {
 
-	private String pageNo = null;
-    private String pageSize = null;
-    private String total = null;
-    private List<T> rows = null;
+	private int pageNo;
+    private int pageSize;
+    private int total;
+    private List<T> items = null;
 
-    public String getTotal() {
-        return total;
-    }
+    public List<T> getItems() {
+		return items;
+	}
 
-    public void setTotal(String total) {
-        this.total = total;
-    }
+	public void setItems(List<T> items) {
+		this.items = items;
+	}
 
-    public List<T> getRows() {
-        return rows;
-    }
+	public int getPageNo() {
+		return pageNo;
+	}
 
-    public void setRows(List<T> rows) {
-        this.rows = rows;
-    }
+	public void setPageNo(int pageNo) {
+		this.pageNo = pageNo;
+	}
 
-    public String getPageNo() {
-        return pageNo;
-    }
+	public int getPageSize() {
+		return pageSize;
+	}
 
-    public void setPageNo(String pageNo) {
-        this.pageNo = pageNo;
-    }
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
 
-    public String getPageSize() {
-        return pageSize;
-    }
+	public int getTotal() {
+		return total;
+	}
 
-    public void setPageSize(String pageSize) {
-        this.pageSize = pageSize;
-    }
+	public void setTotal(int total) {
+		this.total = total;
+	}
+
 
 }

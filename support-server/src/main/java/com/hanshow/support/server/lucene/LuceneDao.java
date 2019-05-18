@@ -17,7 +17,7 @@ public interface LuceneDao<T> {
 	 * 创建
 	 * @param doc
 	 */
-	void insert(Document doc) throws IOException;
+	void insert(T t) throws IOException, IllegalAccessException;
 	
 	/**
 	 * 删除基于id
@@ -32,7 +32,7 @@ public interface LuceneDao<T> {
 	 * @param fieldName 字段
 	 * @param fieldValue 值
 	 */
-	void update(Document doc, String fieldName, String fieldValue) throws IOException;
+	void update(T t, String fieldName, String fieldValue) throws IOException, IllegalAccessException;
 	
 	/**
 	 * 查出所有匹配关键字的内容
@@ -48,7 +48,7 @@ public interface LuceneDao<T> {
 	 * @param offset 从0开始
 	 * @param limit 查几条
 	 */
-	List<T> queryForPage(String keyword, String[] fieldNames, int offset, int limit) throws Exception;
+	List<T> queryForPage(String keyword, String[] fieldNames, int offset, int limit, T t) throws Exception;
 	
 	/**
 	 * 满足条件的数量

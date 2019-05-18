@@ -10,7 +10,7 @@ public class Ap {
 	
 	private String mac;
 	
-	private boolean status = true;
+	private boolean online;
 	
 	public Ap() {}
 	
@@ -50,11 +50,13 @@ public class Ap {
 		this.mac = mac;
 	}
 
-	public boolean isStatus() {
-		return status;
+	public boolean isOnline() {
+		return online;
 	}
 
-	public void setStatus(boolean status) {
-		this.status = status;
+	public void setOnline(boolean online) {
+		this.online = online;
 	}
+
+	
 }

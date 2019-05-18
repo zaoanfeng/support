@@ -1,5 +1,7 @@
 package com.hanshow.support.server.service;
 
+import java.util.List;
+
 import com.hanshow.support.server.mybatis.Pages;
 
 public interface BaseService<T, ID> {
@@ -8,7 +10,7 @@ public interface BaseService<T, ID> {
 	
 	boolean updateById(T t, ID id);
 	
-	boolean updateSelectiveById(T t);
+	boolean updateSelectiveById(T t, ID id);
 	
 	boolean delete(T t);
 	
@@ -16,5 +18,10 @@ public interface BaseService<T, ID> {
 	
 	T queryById(ID id);
 	
-	Pages<T> queryForPage(T t, int offset, int limit);
+	int queryCount(T t);
+	
+	List<T> queryForPage(T t, int offset, int limit);
+	
+	Pages<T> queryForPageAndTotal(T t, int offset, int limit);
+
 }

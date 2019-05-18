@@ -26,9 +26,9 @@ public class Authorities implements GrantedAuthority, Serializable {
     private String username;
 
     private String authority;
+    
+    private String clientId;
 
     private String description;
-
-    
 
 }

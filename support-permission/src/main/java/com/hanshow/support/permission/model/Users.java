@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import lombok.Data;
 
@@ -25,6 +26,9 @@ public class Users implements Serializable {
 	@Id
 	@Column(unique = true, nullable = false)
 	private String username;
+	
+	@Transient
+	private String oldPassword;
 	
 	private String password;
 	

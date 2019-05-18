@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hanshow.support.permission.model.ClientDetails;
+import com.hanshow.support.permission.model.Pages;
 import com.hanshow.support.permission.service.ClientDetailsService;
 
 @RestController
@@ -97,7 +97,7 @@ public class ClientDetailsController  {
 	 * @return 客户列表
 	 */
 	@RequestMapping(method=RequestMethod.GET)
-	public HttpEntity<Page<ClientDetails>> query(@RequestParam(value="offset") int page, @RequestParam(value="limit") int size) {	
+	public HttpEntity<Pages<ClientDetails>> query(@RequestParam(value="offset") int page, @RequestParam(value="limit") int size) {	
 		return ResponseEntity.ok().body(clientDetailsService.queryForPage((page <= 0 ? 1 : page) - 1, size));
 
 	}

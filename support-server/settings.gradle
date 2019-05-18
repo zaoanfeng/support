@@ -17,5 +17,7 @@ include 'services:webservice'
 
 rootProject.name = 'support-server'
 
-include ':support-core'
+include ':support-core' 
+//,':permission-client'
 project(':support-core').projectDir = new File(settingsDir, '../support-core')
+//project(':permission-client').projectDir = new File(settingsDir, '../permission-client')

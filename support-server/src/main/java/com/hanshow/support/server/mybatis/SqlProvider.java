@@ -10,6 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.ibatis.binding.MapperMethod.ParamMap;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,36 +60,45 @@ public class SqlProvider {
 	 * @param t
 	 * @return
 	 */
-	public <T, ID> String updateById(ID id, T t) throws IllegalAccessException {
-		return new SQL() {
+	@SuppressWarnings("unchecked")
+	public <T, ID> String updateById(ParamMap<Object> params) throws IllegalAccessException {
+		String sql = new SQL() {
 			{
+				copyParams(params);
+				T t = (T) params.get("t");
+				String queryId = (String) params.get("queryId");
 				UPDATE(getTableName(t));
 				String[] columns = getColumn(t);
 				for (String column : columns) {
 					SET(translateColumn(column) + " = #{" + column + "}");
 				}
-				String where = id.getClass().getSimpleName();
-				WHERE(translateColumn(where) + " = #{" + where + "}");
+				WHERE(translateColumn(queryId) + " = #{" + queryId + "}");
 			}
 		}.toString();
+		logger.debug(sql);
+		return sql;
 	}
 
 	/**
 	 * 拼接更新sql
 	 * 
 	 * @param t
-	 * @return
+	 * @return 
+	 * 
 	 */
-	public <T, ID> String updateSelectiveById(ID id, T t) throws IllegalAccessException {
+	@SuppressWarnings("unchecked")
+	public <T, ID> String updateSelectiveById(ParamMap<Object> params) throws IllegalAccessException {
 		return new SQL() {
 			{
+				copyParams(params);
+				T t = (T) params.get("t");
+				String queryId = (String) params.get("queryId");
 				UPDATE(getTableName(t));
 				String[] columns = getColumnIsNotNull(t);
 				for (String column : columns) {
 					SET(translateColumn(column) + " = #{" + column + "}");
 				}
-				String where = id.getClass().getSimpleName();
-				WHERE(translateColumn(where) + " = #{" + where + "}");
+				WHERE(translateColumn(queryId) + " = #{" + queryId + "}");
 			}
 		}.toString();
 	}
@@ -138,16 +148,20 @@ public class SqlProvider {
 	 * @param id
 	 * @return
 	 * @throws IllegalAccessException
+	 * @throws ClassNotFoundException 
 	 */
-	public <T, ID> String selectById(T t, ID id) throws IllegalAccessException {
-		return new SQL() {
+	@Deprecated
+	public <T, ID> String selectById(T t, ID id) throws IllegalAccessException, ClassNotFoundException {
+		String sql =new SQL() {
 			{
-				SELECT(getColumn(t));
+				SELECT(getSelectColumn(t));
 				FROM(getTableName(t));
-				String where = id.getClass().getSimpleName();
-				WHERE(translateColumn(where) + " = #{" + where + "}");
+				String where = id.getClass().getCanonicalName();
+				WHERE(translateColumn(where) + " = #{" + id + "}");
 			}
 		}.toString();
+		logger.debug(sql);
+		return sql;
 	}
 
 	/**
@@ -159,9 +173,9 @@ public class SqlProvider {
 	 * @throws IllegalAccessException
 	 */
 	public <T> String select(T t) throws IllegalAccessException {
-		return new SQL() {
+		String sql =  new SQL() {
 			{
-				SELECT(getColumn(t));
+				SELECT(getSelectColumn(t));
 				FROM(getTableName(t));
 				Map<String, Object> map = getColumnAndValue(t);
 				for (String column : map.keySet()) {
@@ -171,6 +185,83 @@ public class SqlProvider {
 				}
 			}
 		}.toString();
+		logger.debug(sql);
+		return sql;
+	}
+
+	/**
+	 * 基于对象查询数量
+	 * 
+	 * @param t
+	 * @param id
+	 * @return
+	 * @throws IllegalAccessException
+	 */
+	public <T> String selectCount(T t) throws IllegalAccessException {
+		String sql = new SQL() {
+			{
+				SELECT("count(1)");
+				FROM(getTableName(t));
+				Map<String, Object> map = getColumnAndValue(t);
+				for (String column : map.keySet()) {
+					if (map.get(column) != null) {
+						WHERE(translateColumn(column) + " = #{" + column + "}");
+					}
+				}
+			}
+		}.toString();
+		logger.debug(sql);
+		return sql;
+	}
+
+	/**
+	 * 基于对象查询
+	 * 
+	 * @param t
+	 * @param id
+	 * @return
+	 * @throws IllegalAccessException
+	 */
+	public <T> String selectForPage(ParamMap<Object> params) throws IllegalAccessException {
+		String sql = new SQL() {
+			{
+				copyParams(params);
+				SELECT(getSelectColumn(params.get("t")));
+				FROM(getTableName(params.get("t")));
+				Map<String, Object> map = getColumnAndValue(params.get("t"));
+				for (String column : map.keySet()) {
+					if (map.get(column) != null) {
+						WHERE(translateColumn(column) + " = #{" + column + "}");
+					}
+					logger.debug(translateColumn(column) + " = " + map.get(column));
+				}
+			}
+		}.toString();
+		logger.debug(sql);
+		return sql;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> void copyParams(ParamMap<Object> params) {
+		// TODO Auto-generated method stub
+		// 获取字段
+		T t = (T) params.get("t");
+		if (t != null) {
+			Field[] fields = t.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				if (field.getName().equals("serialVersionUID")) {
+					continue;
+				}				
+
+				try {
+					field.setAccessible(true);
+					params.put(field.getName(), field.get(t));
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					logger.error(e.getMessage(), e);
+				}
+				
+			}
+		}				
 	}
 
 	/**
@@ -196,7 +287,15 @@ public class SqlProvider {
 	 * @return
 	 */
 	private <T> String[] getColumn(T t) throws IllegalAccessException {
-		return getColumn(t, false);
+		return getColumn(t, false, false);
+	}
+
+	private <T> String[] getSelectColumn(T t) throws IllegalAccessException {
+		return getColumn(t, false, true);
+	}
+
+	private <T> String[] getColumn(T t, boolean isGenerateId) throws IllegalAccessException {
+		return getColumn(t, isGenerateId, false);
 	}
 
 	/**
@@ -206,9 +305,10 @@ public class SqlProvider {
 	 * @return
 	 * @throws Exception
 	 */
-	private <T> String[] getColumn(T t, boolean isGenerateId) throws IllegalAccessException {
+	private <T> String[] getColumn(T t, boolean isGenerateId, boolean isSelect) throws IllegalAccessException {
 		// 获取字段
-		Field[] fields = t.getClass().getDeclaredFields();
+		Class<? extends Object> clazz = t.getClass();
+		Field[] fields = clazz.getDeclaredFields();
 		List<String> columns = new ArrayList<>();
 		// 遍例每一个属性
 		for (Field field : fields) {
@@ -237,7 +337,11 @@ public class SqlProvider {
 			if (key == null || key.isEmpty()) {
 				throw new IllegalArgumentException("column cannot found");
 			} else {
-				columns.add(key);
+				if (isSelect) {
+					columns.add(translateColumn(key) + " AS " + key);
+				} else {
+					columns.add(key);
+				}
 			}
 		}
 		return columns.toArray(new String[columns.size()]);

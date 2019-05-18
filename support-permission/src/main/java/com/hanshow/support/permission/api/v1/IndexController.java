@@ -24,7 +24,7 @@ public class IndexController {
     public HttpEntity<List<Link>> index() throws SQLException{
 		List<Link> list = new ArrayList<>();
 		list.add(linkTo(methodOn(UsersController.class).insert(new Users())).withRel("register").withTitle("users").withType("POST"));
-        list.add(linkTo(methodOn(UsersController.class).query(1, 20)).withRel("collection").withTitle("users").withType("GET"));
+        list.add(linkTo(methodOn(UsersController.class).query(null, 1, 20)).withRel("collection").withTitle("users").withType("GET"));
         return ResponseEntity.ok(list);
     }
 }

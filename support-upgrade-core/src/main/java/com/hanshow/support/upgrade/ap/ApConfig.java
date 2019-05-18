@@ -26,16 +26,18 @@ public abstract class ApConfig {
 	
 	private static Logger logger = LoggerFactory.getLogger(ApConfig.class);
 	
-	private String eslworkingIp;
-	private String eslworkingPort;
+
 	
 	
 	public void exec() {
 		String eslworkingApsUrl = Config.getInstance().getString("ap.eslworking.aps.url");
 		String apIpList = Config.getInstance().getString("ap.ip.list");
+		String eslworkingIp = Config.getInstance().getString("ap.eslworking.ip");
+		String eslworkingPort = Config.getInstance().getString("ap.eslworking.port");
 		List<Ap> apList = new ArrayList<>();
 		//接口获取ip地址
 		if (eslworkingApsUrl != null && !eslworkingApsUrl.equals("")) {
+			System.out.println("Get ip info from ESL-Working");
 			try {
 				apList = getApList(eslworkingApsUrl.toString());
 			} catch (IOException | URISyntaxException e) {
@@ -43,6 +45,7 @@ public abstract class ApConfig {
 				System.out.println(e.getMessage());
 			}
 		} else if (apIpList != null && !apIpList.equals("")) {
+			System.out.println("Get ip info from " + apIpList);
 			// 从ip列表文件获取ip地址
 			File file = new File(apIpList.toString());
 			if (file.exists() && file.getName().endsWith(TXT)) {
@@ -50,10 +53,11 @@ public abstract class ApConfig {
 				try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
 					String line = "";
 					while ((line = reader.readLine()) != null) {
-						if (line.trim().matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
+						logger.info(line);
+						//if (line.trim().matches("(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|[0-1]\\d{2}|[1-9]?\\d)")) {
 							Ap ap = new Ap(line.trim());
 							apList.add(ap);
-						}
+						//}
 					}
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
@@ -104,22 +108,5 @@ public abstract class ApConfig {
 	}
 	
 	protected abstract boolean modifyApPort(Ap ap, String url, String port) throws Exception;
-
-	public String getEslworkingIp() {
-		return eslworkingIp;
-	}
-
-	public void setEslworkingIp(String eslworkingIp) {
-		this.eslworkingIp = eslworkingIp;
-	}
-
-	public String getEslworkingPort() {
-		return eslworkingPort;
-	}
-
-	public void setEslworkingPort(String eslworkingPort) {
-		this.eslworkingPort = eslworkingPort;
-	}
-	
-	
+		
 }

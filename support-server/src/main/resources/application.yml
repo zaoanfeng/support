@@ -7,15 +7,24 @@ logging:
 
 security:
   oauth2:
+    server:
+      url: http://localhost:8080
     resource:
       tokenInfoUri: http://localhost:8080/oauth/check_token
+      #filter-order: 3
       preferTokenInfo: true
 
     client:
       accessTokenUri: http://localhost:8080/oauth/token
       userAuthorizationUri: http://localhost:8080/oauth/authorize
+      authorityUri: http://localhost:8080/
+      clientAuthenticationScheme: form
       clientId: 10086
       clientSecret: 123456
+      provider: support
+      grantType: password
+    sso: 
+      login-path: /login
 
 #开发配置
 spring:
@@ -28,7 +37,13 @@ spring:
         show-sql: true
         hibernate: 
             ddl-auto: update
+        database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
     
 mybatis:
-  typeAliasesPackage: com.hanshow.support.server.model
-  mapperLocations: classpath:com.hanshow.support.server.mapper/*.xml
+    typeAliasesPackage: com.hanshow.support.server.model
+    mapperLocations: classpath:com.hanshow.support.server.mapper/*.xml
+    config-location: classpath:mybatis-config.xml
+http:
+  allowed: 
+    origin: true
+        

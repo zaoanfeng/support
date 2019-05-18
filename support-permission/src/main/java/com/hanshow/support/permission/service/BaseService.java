@@ -3,7 +3,7 @@ package com.hanshow.support.permission.service;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
+import com.hanshow.support.permission.model.Pages;
 
 public interface BaseService<T, ID> {
 
@@ -14,6 +14,8 @@ public interface BaseService<T, ID> {
 	 * @throws SQLException
 	 */
 	boolean insert(T t) throws SQLException;
+	
+	boolean insert(List<T> list) throws SQLException;
 	
 	/**
 	 * 根据id删除一个用户
@@ -83,7 +85,7 @@ public interface BaseService<T, ID> {
 	 * @param size 每页长度
 	 * @return
 	 */
-	Page<T> queryForPage(int page, int size);
+	Pages<T> queryForPage(int page, int size);
 	
 	/**
 	 * 带查询条件的分页
@@ -92,7 +94,7 @@ public interface BaseService<T, ID> {
 	 * @param size 每页长度
 	 * @return
 	 */
-	Page<T> queryForPage(T t, int page, int size);
+	Pages<T> queryForPage(T t, int page, int size);
 	
 	/**
 	 * 查总数量

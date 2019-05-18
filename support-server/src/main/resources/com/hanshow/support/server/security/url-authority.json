@@ -1,0 +1,14 @@
+[
+	{
+		"url": "/v1/users/**",
+		"authority": "ROLE_USER"
+	},
+	{
+		"url": "/v1/store/**",
+		"authority": "ROLE_STORE"
+	},
+	{
+		"url": "/v1/store*",
+		"authority": "ROLE_STORE"
+	}
+]

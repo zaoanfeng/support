@@ -1,10 +1,10 @@
 package com.hanshow.support.permission.api.v1;
 
+import java.security.Principal;
 import java.sql.SQLException;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hanshow.support.permission.model.Pages;
 import com.hanshow.support.permission.model.Users;
 import com.hanshow.support.permission.service.UsersService;
 
@@ -81,7 +82,7 @@ public class UsersController {
 		if(!usersService.existsById(user.getUsername())) {
 			user.setPassword(null);
 			if (usersService.updateBySelective(user)) {
-				return ResponseEntity.status(HttpStatus.CREATED).build();
+				return ResponseEntity.status(HttpStatus.OK).build();
 			} else {
 				return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
 			}	
@@ -97,18 +98,28 @@ public class UsersController {
 	 * @return 用户列表
 	 */
 	@RequestMapping(method=RequestMethod.GET)
-	public HttpEntity<Page<Users>> query(@RequestParam(value="offset") int page, @RequestParam(value="limit") int size) {	
-		return ResponseEntity.ok().body(usersService.queryForPage((page <= 0 ? 1 : page) - 1, size));
-
+	public HttpEntity<Pages<Users>> query(@RequestBody Users user, @RequestParam(value="offset") int page, @RequestParam(value="limit") int size) {	
+		return ResponseEntity.ok().body(usersService.queryForPage(user, (page <= 0 ? 1 : page) - 1, size));
 	}
+	
+	/**
+	 * 分页查询数据
+	 * @param page
+	 * @param size
+	 * @return 用户列表
+	 */
+	/*@RequestMapping(method=RequestMethod.GET)
+	public HttpEntity<Pages<Users>> query(@RequestParam(value="offset") int page, @RequestParam(value="limit") int size) {	
+		return ResponseEntity.ok().body(usersService.queryForPage((page <= 0 ? 1 : page) - 1, size));
+	}*/
 	
 	/**
 	 * 查询指定用户
 	 * @param username
 	 * @return 用户对象
 	 */
-	@RequestMapping(value="/{id}", method=RequestMethod.GET)
-	public HttpEntity<Users> queryById(@PathVariable("id") String username) {
-		return ResponseEntity.ok().body(usersService.queryById(username));
+	@RequestMapping(value="/info", method=RequestMethod.GET)
+	public HttpEntity<String> queryById(Principal principal) {
+		return ResponseEntity.ok().body(principal.getName());
 	}
 }

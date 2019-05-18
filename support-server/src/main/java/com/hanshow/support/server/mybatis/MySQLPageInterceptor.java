@@ -22,16 +22,14 @@ import org.apache.ibatis.reflection.SystemMetaObject;
  * method 拦截的方法
  * args 参数,高版本需要加个Integer.class参数,不然会报错
  */
-@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class})})
+@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
+
 public class MySQLPageInterceptor implements Interceptor {
 
     //每页显示的条目数
     private int pageSize;
     //当前现实的页数
     private int currPage;
-    //数据库类型
-    private String dbType;
-
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -64,11 +62,12 @@ public class MySQLPageInterceptor implements Interceptor {
         //statementHandler.getBoundSql().getParameterObject();
 
         //拦截以.ByPage结尾的请求，分页功能的统一实现
-        if (mapId.matches(".+ByPage$")) {
+        if (mapId.matches(".+ForPage$")) {
             //获取进行数据库操作时管理参数的handler
             ParameterHandler parameterHandler = (ParameterHandler) MetaObjectHandler.getValue("delegate.parameterHandler");
             //获取请求时的参数
-            Map<String, Object> paraObject = (Map<String, Object>) parameterHandler.getParameterObject();
+            @SuppressWarnings("unchecked")
+			Map<String, Object> paraObject = (Map<String, Object>) parameterHandler.getParameterObject();
             //也可以这样获取
             //paraObject = (Map<String, Object>) statementHandler.getBoundSql().getParameterObject();
 
@@ -88,6 +87,7 @@ public class MySQLPageInterceptor implements Interceptor {
             //将构建完成的分页sql语句赋值个体'delegate.boundSql.sql'，偷天换日
             MetaObjectHandler.setValue("delegate.boundSql.sql", limitSql);
         }
+        
         //调用原对象的方法，进入责任链的下一级
         return invocation.proceed();
     }
@@ -97,15 +97,14 @@ public class MySQLPageInterceptor implements Interceptor {
     @Override
     public Object plugin(Object o) {
         //生成object对象的动态代理对象
-        return Plugin.wrap(o, this);
+        Object target = Plugin.wrap(o, this);
+        return target;
     }
 
     //设置代理对象的参数
     @Override
     public void setProperties(Properties properties) {
         //如果项目中分页的pageSize是统一的，也可以在这里统一配置和获取，这样就不用每次请求都传递pageSize参数了。参数是在配置拦截器时配置的。
-        String limit1 = properties.getProperty("limit", "10");
-        this.pageSize = Integer.valueOf(limit1);
-        this.dbType = properties.getProperty("dbType", "mysql");
+        //this.dbType = properties.getProperty("dbType", "mysql");
     }
 }
