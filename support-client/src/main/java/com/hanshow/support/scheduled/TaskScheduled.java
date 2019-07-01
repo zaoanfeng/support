@@ -27,9 +27,9 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSONException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hanshow.support.SpringUtil;
-import com.hanshow.support.analysis.LogAnalysis;
-import com.hanshow.support.analysis.RealTimeLogAnalysis;
-import com.hanshow.support.mail.Mail;
+import com.hanshow.support.analysis.EslworkingPackLogAnalysis;
+import com.hanshow.support.analysis.EslworkingLogAnalysis;
+import com.hanshow.support.mail.MailClient;
 import com.hanshow.support.model.ApRecord;
 import com.hanshow.support.model.Store;
 import com.hanshow.support.monitor.Config;
@@ -45,9 +45,9 @@ import com.hanshow.support.util.JsonUtils;
 public class TaskScheduled {
 
 	@Autowired
-	private LogAnalysis diskAnalysis;
+	private EslworkingPackLogAnalysis diskAnalysis;
 	@Autowired
-	private RealTimeLogAnalysis realTimeLogAnalysis;
+	private EslworkingLogAnalysis realTimeLogAnalysis;
 	private Monitor monitor = new Monitor();
 	private Calendar lastActiveTime;
 	Map<String, Object> translateMap = null;
@@ -125,8 +125,8 @@ public class TaskScheduled {
 			}
 			map.put("ap", apRecords);
 			String mailTitle = ((Map<String, String>)this.translateMap.get("mail")).get("title") + "-" + store.getName() + "(" + store.getCode() + ")";
-			Template template = Mail.loadTemplate("vm/MailBody.vm");
-			Mail.sendHtml(mailTitle, map, template, this.translateMap,
+			Template template = MailClient.loadTemplate("vm/MailBody.vm");
+			MailClient.sendHtml(mailTitle, map, template, this.translateMap,
 					Config.getInstance().getString("mail.recipients").split(","));
 			logger.info("mail send successed !");
 		}

@@ -38,20 +38,6 @@ public class SqlProvider {
 				}
 			}
 		}.toString();
-
-		/*
-		 * StringBuffer sql = new StringBuffer("INSERT INTO ");
-		 * sql.append("`").append(getTableName(t)).append("`("); String[] columns =
-		 * getColumn(t); Set<String> keySet = map.keySet(); Iterator<String> keys =
-		 * keySet.iterator(); int i=0; while(keys.hasNext()) { i++;
-		 * sql.append("`").append(keys.next()); if (i < keySet.size()) {
-		 * sql.append("`, "); } } sql.append(") VALUES ("); i=0; Set<Entry<String,
-		 * Object>> entrySet = map.entrySet(); Iterator<Entry<String, Object>> entrys =
-		 * entrySet.iterator(); while(entrys.hasNext()) { i++;
-		 * sql.append("`").append(entrys.next()); if (i < entrySet.size()) {
-		 * sql.append("`, "); } } sql.append(");"); return new
-		 * SQL().INSERT_INTO(sql.toString()).toString();
-		 */
 	}
 
 	/**
@@ -109,14 +95,17 @@ public class SqlProvider {
 	 * @param t
 	 * @return
 	 */
+	@Deprecated
 	public <T, ID> String deleteById(T t, ID id) {
-		return new SQL() {
+		String sql =  new SQL() {
 			{
 				DELETE_FROM(getTableName(t));
 				String where = id.getClass().getSimpleName();
 				WHERE(translateColumn(where) + " = #{" + where + "}");
 			}
 		}.toString();
+		logger.debug(sql);
+		return sql;
 	}
 
 	/**
@@ -127,7 +116,7 @@ public class SqlProvider {
 	 * @throws IllegalAccessException
 	 */
 	public <T> String delete(T t) throws IllegalAccessException {
-		return new SQL() {
+		String sql = new SQL() {
 			{
 				DELETE_FROM(getTableName(t));
 				Map<String, Object> map = getColumnAndValue(t);
@@ -139,6 +128,8 @@ public class SqlProvider {
 
 			}
 		}.toString();
+		logger.debug(sql);
+		return sql;
 	}
 
 	/**

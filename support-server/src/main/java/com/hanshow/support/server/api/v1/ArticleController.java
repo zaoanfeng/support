@@ -1,7 +1,6 @@
 package com.hanshow.support.server.api.v1;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -22,10 +21,6 @@ import com.alibaba.fastjson.JSON;
 import com.hanshow.support.server.model.Article;
 import com.hanshow.support.server.mybatis.Pages;
 import com.hanshow.support.server.service.ArticleService;
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 
 @RestController
 @RequestMapping("/v1/article")

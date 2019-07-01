@@ -19,7 +19,7 @@ public class Issue implements Serializable{
 	@Id
 	@Column(name="id", unique = true, nullable = false)
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	private Long id;
 	
 	private String title;
 	
@@ -28,14 +28,18 @@ public class Issue implements Serializable{
 	private String content;
 	
 	private String answer;
+
+	private Integer level;
+	
+	private Date updateTime;
 	
 	private Date createTime;
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -69,6 +73,22 @@ public class Issue implements Serializable{
 
 	public void setAnswer(String answer) {
 		this.answer = answer;
+	}
+
+	public Integer getLevel() {
+		return level == null ? 0 : level;
+	}
+
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
 	public Date getCreateTime() {

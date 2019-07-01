@@ -55,7 +55,7 @@ public class IssueServiceImpl extends BaseServiceImpl<Issue, Long> implements Is
 	@Override
 	public List<Issue> search(String keyword, int offset, int limit) {
 		try {
-			List<Issue> list =luceneDao.queryForPage(keyword, new String[]{"title", "content", "answer"}, offset, limit, new Issue());
+			List<Issue> list =luceneDao.queryForPage(keyword, new String[]{"content"}, offset, limit, new Issue());
 			return list;
 		} catch (Exception e) {
 			super.logger.error(e.getMessage(), e);

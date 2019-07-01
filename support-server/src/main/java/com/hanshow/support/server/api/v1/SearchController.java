@@ -1,6 +1,5 @@
 package com.hanshow.support.server.api.v1;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import com.hanshow.support.server.model.Issue;
 import com.hanshow.support.server.model.Search;
 import com.hanshow.support.server.service.ArticleService;
 import com.hanshow.support.server.service.IssueService;
+import com.hanshow.support.server.service.SearchService;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
@@ -28,6 +28,8 @@ public class SearchController {
 	//private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
+	private SearchService searchService;
+	@Autowired
 	private IssueService issueService;
 	@Autowired
 	private ArticleService articleService;
@@ -35,7 +37,7 @@ public class SearchController {
 	@GetMapping
 	public HttpEntity<List<Search>> query(@RequestParam(value="keyword")String keyword, @RequestParam(value="offset") int page, @RequestParam(value="limit") int size) {	
 		// 查问题
-		List<Issue> issueList = issueService.search(keyword, (page <= 0 ? 1 : page) - 1, size);
+		/*List<Issue> issueList = issueService.search(keyword, (page <= 0 ? 1 : page) - 1, size);
 		List<Search> searchList = new ArrayList<>();
 		if (issueList != null) {
 			issueList.forEach(i -> {
@@ -50,7 +52,8 @@ public class SearchController {
 				Search search = new Search(i.getId(), i.getClass().getSimpleName(), i.getTitle(), "", i.getContent());
 				searchList.add(search);
 			});
-		}
+		}*/
+		List<Search> searchList = searchService.search(keyword, (page <= 0 ? 1 : page) - 1, size);
 		return ResponseEntity.ok().body(searchList);
 	}
 	

@@ -26,14 +26,13 @@ public abstract class ApConfig {
 	
 	private static Logger logger = LoggerFactory.getLogger(ApConfig.class);
 	
-
+	String eslworkingIp = Config.getInstance().getString("ap.eslworking.ip");
+	String eslworkingPort = Config.getInstance().getString("ap.eslworking.port");
 	
 	
 	public void exec() {
 		String eslworkingApsUrl = Config.getInstance().getString("ap.eslworking.aps.url");
 		String apIpList = Config.getInstance().getString("ap.ip.list");
-		String eslworkingIp = Config.getInstance().getString("ap.eslworking.ip");
-		String eslworkingPort = Config.getInstance().getString("ap.eslworking.port");
 		List<Ap> apList = new ArrayList<>();
 		//接口获取ip地址
 		if (eslworkingApsUrl != null && !eslworkingApsUrl.equals("")) {
@@ -100,6 +99,7 @@ public abstract class ApConfig {
 		Request request = new Request.Builder().url(url).get().build();
 		Response response = client.newCall(request).execute();
 		JSONObject jo = (JSONObject) JSONObject.parse(response.body().string());
+		response.close();
 		if (jo.getIntValue("errno") == 0) {
 			List<Ap> apList = JSONArray.parseArray(((JSONObject) jo.get("ap_list")).get("g2").toString(), Ap.class);
 			return apList;
@@ -108,5 +108,20 @@ public abstract class ApConfig {
 	}
 	
 	protected abstract boolean modifyApPort(Ap ap, String url, String port) throws Exception;
-		
+	
+	public String getEslworkingIp() {
+		return eslworkingIp;
+	}
+
+	public void setEslworkingIp(String eslworkingIp) {
+		this.eslworkingIp = eslworkingIp;
+	}
+
+	public String getEslworkingPort() {
+		return eslworkingPort;
+	}
+
+	public void setEslworkingPort(String eslworkingPort) {
+		this.eslworkingPort = eslworkingPort;
+	}
 }

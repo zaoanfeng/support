@@ -1,42 +1,59 @@
 package com.hanshow.support.analysis.shopweb;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import com.hanshow.support.log.LogAnalysis;
+import com.hanshow.support.model.Store;
+import com.hanshow.support.service.StoreService;
+import com.hanshow.support.util.Config;
+
+@Service
 public class ShopwebLogAnalysis {
+	
+	private static final String LOG_PATH = "/logs";
+	private static final String[] LOG_LIST = new String[] {};
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	@Autowired
+	private StoreService storeService;
 
-	public static void main(String[] args) {
-		File file = new File("C:\\Users\\Administrator\\Documents\\WeChat Files\\zaoanfeng\\FileStorage\\File\\2019-04\\shopweb-core-info.log");
-		Map<String, String> list = new HashMap<String, String>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			String line;
-	            while ((line = reader.readLine()) != null) {
-	            	//各种类型的打包数据（清屏、更新、查询、组网）
-	                if (line.indexOf("record Integration data") != -1) {
-	                	String str = line.substring(line.indexOf("{"));
-	                	JSONObject jsonObject = (JSONObject) JSON.parse(str);
-	                	JSONArray jsonArray = (JSONArray) jsonObject.get("items");
-	                	for (Object obj : jsonArray) {
-	                		JSONObject jo = (JSONObject)obj;
-	                		String sku = jo.getString("sku");
-	                		if (list.keySet().contains(sku)) {
-	                			
-	                			System.out.println("1 -> " + list.get(sku));
-	                			System.out.println("2 -> " + JSON.toJSONString(jo));
-	                		}
-	                		list.put(sku, JSON.toJSONString(jo));
-	                	}
-	                }
-	            }
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+	public void analysis() throws IOException {
+		String shopwebUrl = Config.getInstance().getString("monitor.shopweb.path");
+		if (shopwebUrl != null) {
+			File file = new File(shopwebUrl);
+			if (!file.exists()) {
+				throw new FileNotFoundException(shopwebUrl + "cannot found!");
+			}
+		} else {
+			throw new FileNotFoundException(shopwebUrl + "cannot found!");
+		}
+		File logDir = new File(shopwebUrl + LOG_PATH);
+		if (logDir.exists()) {
+			for(File logFile : logDir.listFiles()) {
+				if (Arrays.asList(LOG_LIST).contains(logFile.getName())) {
+					Store store = new Store();
+					store.setLogPath(logFile.getPath());
+					store = storeService.queryAll(store).stream().findFirst().orElse(new Store());
+					long position = 0;
+					store.getSeek();
+					logger.debug("position=" + store.getSeek());
+					logger.debug("file.length()=" + logFile.length());
+					if(logFile.length() > store.getSeek()) {
+						position = store.getSeek();
+					}
+					List<String> list = new ArrayList<>();
+					LogAnalysis.analysisLogBack(logFile, position, list);
+				}
+			}
+		}
 	}
 }

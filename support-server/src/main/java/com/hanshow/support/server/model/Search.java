@@ -16,6 +16,8 @@ public class Search implements Serializable {
 	
 	private String title;
 	
+	public Search() {}
+	
 	public Search(Long id, String type, String title, String author, String content) {
 		this.id = id;
 		this.type = type;

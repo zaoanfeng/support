@@ -71,7 +71,24 @@ public class BaseServiceImpl<T, ID> implements BaseService<T, ID> {
 
 	@Override
 	public boolean deleteById(ID id) {
-		return baseMapper.deleteById(id) > 0 ? true : false;
+		Type type = getClass().getGenericSuperclass();
+		ParameterizedType p = (ParameterizedType) type;
+		@SuppressWarnings("unchecked")
+		Class<T> c = (Class<T>) p.getActualTypeArguments()[0];
+		T t = null;
+		try {
+			t = c.newInstance();
+			Field[] fields = t.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(Id.class)) {
+					field.setAccessible(true);
+					field.set(t, id);
+				}
+			}
+		} catch (InstantiationException | IllegalAccessException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return delete(t);
 	}
 
 	@Override

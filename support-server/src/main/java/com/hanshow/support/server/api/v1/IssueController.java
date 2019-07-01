@@ -1,7 +1,6 @@
 package com.hanshow.support.server.api.v1;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
 import com.hanshow.support.server.model.Issue;
+import com.hanshow.support.server.mybatis.Pages;
 import com.hanshow.support.server.service.IssueService;
 
 @RestController
@@ -35,6 +35,7 @@ public class IssueController {
 	public HttpEntity<Void> insert(@RequestBody String data) {
 		Issue issue = JSON.parseObject(data, Issue.class);
 		issue.setCreateTime(new Date());
+		issue.setUpdateTime(new Date());
 		issueService.insert(issue);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -46,17 +47,20 @@ public class IssueController {
 	}
 	
 	@PutMapping
-	public HttpEntity<Void> update(@RequestBody Issue issue) {
+	public HttpEntity<Void> update(@RequestBody String data) {
+		Issue issue = JSON.parseObject(data, Issue.class);
+		issue.setUpdateTime(new Date());
 		if (issueService.updateById(issue, issue.getId())) {
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		} else {
 			return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).build();
-		}
-		
+		}	
 	}
 	
 	@PatchMapping
-	public HttpEntity<Void> updateSelective(@RequestBody Issue issue) {
+	public HttpEntity<Void> updateSelective(@RequestBody String data) {
+		Issue issue = JSON.parseObject(data, Issue.class);
+		issue.setUpdateTime(new Date());
 		if (issueService.updateSelectiveById(issue, issue.getId())) {
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		} else {
@@ -65,8 +69,14 @@ public class IssueController {
 	}
 	
 	@GetMapping
-	public HttpEntity<List<Issue>> query(@RequestParam(value="keyword")String keyword, @RequestParam(value="offset") int page, @RequestParam(value="limit") int size) {	
-		return ResponseEntity.ok().body(issueService.search(keyword, (page <= 0 ? 1 : page) - 1, size));
+	public HttpEntity<Pages<Issue>> query(@RequestParam(value="issue")String params, @RequestParam(value="page") int page, @RequestParam(value="limit") int size) {	
+		Issue issue = JSON.parseObject(params, Issue.class);
+		return ResponseEntity.ok().body(issueService.queryForPageAndTotal(issue, (page <= 0 ? 1 : page), size));
 	}
 
+	@GetMapping("/{id}")
+	public HttpEntity<Issue> query(@PathVariable long id) {
+		Issue issue = issueService.queryById(id);
+		return ResponseEntity.ok().body(issue);
+	}
 }

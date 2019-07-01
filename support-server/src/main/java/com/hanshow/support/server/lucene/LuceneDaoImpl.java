@@ -92,19 +92,19 @@ public class LuceneDaoImpl<T> implements LuceneDao<T> {
 			}
 	        QueryParser queryParser = new MultiFieldQueryParser(newFieldNames, LuceneUtils.getAnalyzer());
 			Query query = queryParser.parse(keywords);*/
-			String suffix = t.getClass().getSimpleName();
+			// String suffix = t.getClass().getSimpleName();
 			Builder builder = new BooleanQuery.Builder();
 			List<String> keys = LuceneUtils.getTokenStream(fieldNames[0], keywords);
 			for (String fieldName : fieldNames) {
 				PhraseQuery.Builder subBuilder = new PhraseQuery.Builder();
 				for (int i = 0; i < keys.size(); i++) {
-					subBuilder.add(new Term("_" + suffix + "." + fieldName, keys.get(i)));
+					subBuilder.add(new Term(fieldName, keys.get(i)));
 				}
 				builder.add(subBuilder.setSlop(2).build(), Occur.SHOULD);
 			}
 
 			Query query = builder.build();
-	        TopDocs topDocs = searcher.search(query, 100);
+	        TopDocs topDocs = searcher.search(query, 140);
 	        logger.info("total records：" + topDocs.totalHits);
             // 添加设置文字高亮begin 使用lucene自带的高亮器进行高亮显示
             // html页面高亮显示的格式化，默认是<b></b>
@@ -115,7 +115,7 @@ public class LuceneDaoImpl<T> implements LuceneDao<T> {
             Highlighter highlighter = new Highlighter(formatter, scorer);
 
             // 设置文字摘要，此时摘要大小
-            int fragmentSize = 200;
+            int fragmentSize = 280;
             Fragmenter fragmenter = new SimpleFragmenter(fragmentSize);
             highlighter.setTextFragmenter(fragmenter);
             /** 添加设置文字高亮end */

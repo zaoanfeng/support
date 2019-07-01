@@ -21,6 +21,8 @@ public class Config implements Serializable{
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
+	private String fileName;
+	
 	private Long position;
 	
 	private Date createTime;
@@ -31,6 +33,14 @@ public class Config implements Serializable{
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public Long getPosition() {

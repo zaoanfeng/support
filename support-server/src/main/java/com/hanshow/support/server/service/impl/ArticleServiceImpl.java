@@ -33,6 +33,20 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article, Long> implement
 	}
 	
 	@Override
+	public boolean deleteById(Long id) {
+		// TODO Auto-generated method stub
+		if (super.deleteById(id)) {
+			try {
+				luceneDao.delete("id", Long.toString(id));
+				return true;
+			} catch (IOException e) {
+				super.logger.error(e.getMessage(), e);
+			}
+		}
+		return false;
+	}
+	
+	@Override
 	public boolean updateById(Article t, Long id) {
 		// TODO Auto-generated method stub
 		if (super.updateById(t, id)) {
@@ -49,7 +63,7 @@ public class ArticleServiceImpl extends BaseServiceImpl<Article, Long> implement
 	@Override
 	public List<Article> search(String keyword, int offset, int limit) {
 		try {
-			List<Article> list =luceneDao.queryForPage(keyword, new String[]{"title", "content"}, offset, limit, new Article());
+			List<Article> list =luceneDao.queryForPage(keyword, new String[]{"content"}, offset, limit, new Article());
 			return list;
 		} catch (Exception e) {
 			super.logger.error(e.getMessage(), e);

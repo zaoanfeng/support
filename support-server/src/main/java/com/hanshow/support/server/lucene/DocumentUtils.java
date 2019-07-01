@@ -29,6 +29,7 @@ public class DocumentUtils {
 		Class<? extends Object> clazz = entity.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		try {
+			String result = "";
 			for (Field field : fields) {
 				field.setAccessible(true);
 				if (field.getName().equals("serialVersionUID")) {
@@ -36,28 +37,32 @@ public class DocumentUtils {
 				}
 				if (field.getGenericType().toString().equals("class java.lang.Long") 
 						|| field.getGenericType().toString().equals("long")) {
-					doc.add(new StringField(clazz.getSimpleName() + "." + field.getName(), Long.toString((long) field.get(entity)), Store.YES));
+					doc.add(new StringField(field.getName(), Long.toString((long) field.get(entity)), Store.YES));
 					continue;
 				}
 				if (field.getGenericType().toString().equals("class java.lang.Integer") 
 						|| field.getGenericType().toString().equals("int")) {
-					doc.add(new StringField(clazz.getSimpleName() + "." + field.getName(), Integer.toString((int) field.get(entity)), Store.YES));
+					doc.add(new StringField(field.getName(), Integer.toString((int) field.get(entity)), Store.YES));
 					continue;
 				}
+				
 				if (field.getGenericType().toString().equals("class java.lang.String")) {
-					if (field.get(entity) != null) {
-						if (((String) field.get(entity)).length() < 100) {
+					/*if (field.get(entity) != null) {
+						if (((String) field.get(entity)).length() < 2) {
 							doc.add(new StringField(clazz.getSimpleName() + "." + field.getName(), (String) field.get(entity), Store.YES));
-							doc.add(new TextField("_" + clazz.getSimpleName() + "." + field.getName(),  new StringReader((String) field.get(entity))));
 						} else {
 							doc.add(new TextField(clazz.getSimpleName() + "." + field.getName(), (String) field.get(entity), Store.YES));
-							doc.add(new TextField("_" + clazz.getSimpleName() + "." + field.getName(),  new StringReader((String) field.get(entity))));
 						}
-					}
-					//LuceneUtils.tokenStream(clazz.getSimpleName() + "." + field.getName(), (String) field.get(entity));
+					}*/
+					result += (field.get(entity) + "\n");
 					continue;
 				}
+				
 			}
+			if (!result.equals("")) {
+				doc.add(new TextField("content" , result, Store.YES));
+			}
+			doc.add(new StringField("type", clazz.getSimpleName(), Store.YES));
 			return doc;
 		} catch (IllegalArgumentException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
@@ -91,18 +96,20 @@ public class DocumentUtils {
 		Class<? extends Object> clazz = t.getClass();
 		try {
 			for (IndexableField indexableField : list) {
-				String[] str = (indexableField.name()).split("\\.");
-				if (str.length <2) {
-					continue;
+				String fieldName = (indexableField.name());
+				Field field = null;
+				try {
+					field = clazz.getDeclaredField(fieldName);
+				} catch (NoSuchFieldException e) {
+					logger.debug(fieldName + " field not found!");
 				}
-				String fieldName = str[1];
-				Field field = clazz.getDeclaredField(fieldName);
+				
 				if (field != null) {
 					field.setAccessible(true);
-					String result = document.getField(indexableField.name()).stringValue();
+					String result = document.getField(fieldName).stringValue();
 					if (field.getGenericType().toString().equals("class java.lang.String")) {
-						if (highlighter != null && keywords != null) {			
-							field.set(t, highlighter.getBestFragment(LuceneUtils.getAnalyzer(), indexableField.name(), result));
+						if (highlighter != null && keywords != null && !fieldName.equals("type")) {			
+							field.set(t, highlighter.getBestFragment(LuceneUtils.getAnalyzer(), fieldName, result));
 						} else {
 							field.set(t, result);
 						}
@@ -121,7 +128,7 @@ public class DocumentUtils {
 				}	
 			}
 			return t;
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			logger.error(e.getMessage(), e);
 			throw e;
 		}

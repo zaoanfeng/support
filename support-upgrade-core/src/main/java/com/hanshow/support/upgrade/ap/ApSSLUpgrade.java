@@ -75,7 +75,8 @@ public class ApSSLUpgrade{
 						}
 						Thread.sleep(60 * 1000);
 						System.out.println("ap:" + ap.getId() + "(" + ap.getIp() + ")" + " secuity firmware upgrade finished!");
-						new UpgradeApByHttp().upgrade(ap.getIp());
+						String webPassword = Config.getInstance().getString("ap.web.password");
+						new UpgradeApByHttp().upgrade(ap.getIp(), webPassword == null || webPassword.isEmpty() ? "admin" : webPassword);
 						System.out.println("ap:" + ap.getId() + "(" + ap.getIp() + ")" + " upgrade successed!");
 						finishedResult.put(ap.getIp(), Boolean.TRUE);
 					} catch (Exception e) {
@@ -146,6 +147,7 @@ public class ApSSLUpgrade{
 	 */
 	private static boolean upgrade(Ap ap, File upgradeCmdFile, File upgradePackageFile) {
 		String apPassword = Config.getInstance().getString("ap.password");
+		String apNewPassword = Config.getInstance().getString("ap.new.password");
 		if (apPassword == null || apPassword.isEmpty()) {
 			apPassword = SSH_CONNECT[1];
 		}
@@ -167,7 +169,7 @@ public class ApSSLUpgrade{
 			System.out.println(ap.getIp() + " " + sb.toString());
 			ssh.shell("reboot");
 			System.out.println(ap.getIp() + " is reboot ...........");
-			ssh.reconnect();
+			ssh.reconnect(SSH_CONNECT[0], apNewPassword);
 			return true;
 		} catch(ConnectException e) {
 			System.out.println(ap.getId() + "(" + ap.getIp() + ")" + " connection failed!");
@@ -233,7 +235,12 @@ public class ApSSLUpgrade{
 		Response response = new HttpClient().getHttpClient(request.isHttps()).newCall(request).execute();
 		JSONObject jo = (JSONObject) JSONObject.parse(response.body().string());
 		if (jo.getIntValue("errno") == 0) {
-			List<Ap> apList = JSONArray.parseArray(((JSONObject) jo.get("ap_list")).get("g2").toString(), Ap.class);
+			List<Ap> apList = new ArrayList<>();
+			if (Config.getInstance().getBoolean("ap.eslworking.store.single")) {
+				apList = JSONArray.parseArray(((JSONObject) jo.get("ap_list")).get("g2").toString(), Ap.class);
+			} else {
+				apList = JSONArray.parseArray(((JSONObject) jo.get("data")).get("g2").toString(), Ap.class);
+			}
 			return apList;
 		}
 		return null;

@@ -79,6 +79,31 @@ public class SSH2Tools implements AutoCloseable{
 		return false;
 	}
 	
+	public boolean reconnect(String username, String password) throws Exception {
+		int retryTime = 5;
+		for(int i=0; i<retryTime; i++) {
+	        try {
+	        	Thread.sleep(60 * 1000);
+        		ssh = new SSHClient();
+            	ssh.addHostKeyVerifier(new PromiscuousVerifier());
+                //ssh.loadKnownHosts();
+    			ssh.connect(host, port);
+    			ssh.authPassword(username, password);
+    			return true;	
+			} catch (IOException | InterruptedException e) {
+				if (i >= retryTime - 1) {
+					e.printStackTrace();
+					throw e;
+				} 
+				if (ssh != null) {
+					ssh.close();
+				}		
+			}  
+        
+		}
+		return false;
+	}
+	
 	public void disconnect() throws IOException {
 		if (ssh != null) {
 			ssh.disconnect();

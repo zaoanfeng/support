@@ -27,7 +27,7 @@ public class UpgradeApByHttp {
 		AP_PORT = Config.getInstance().getInt("ap.web.port") == 0 ? 80 : Config.getInstance().getInt("ap.web.port");
 	} 
 
-	public void upgrade(String ip) throws IOException {
+	public void upgrade(String ip, String password) throws IOException {
 		this.ip = ip;
 		this.url = AP_PROTOCOL + "://" + ip + ":" + AP_PORT + "/";
 		String path = System.getProperty("user.dir");
@@ -36,7 +36,7 @@ public class UpgradeApByHttp {
 			throw new FileNotFoundException("Cannot found file at " + file.getPath());
 		}
 		// 先登录
-		login();
+		login(password);
 		// 上传文件
 		upload(file);
 		// 执行提交
@@ -47,10 +47,10 @@ public class UpgradeApByHttp {
 	 * 登录
 	 * @throws IOException
 	 */
-	private void login() throws IOException {
+	private void login(String password) throws IOException {
 
 		FormBody.Builder formbody = new FormBody.Builder();
-		formbody.add("login_pwd", "admin");
+		formbody.add("login_pwd", password);
 		Request request = new Request.Builder().url(url + "login").post(formbody.build()).build();
 		Response response = new HttpClient().getHttpClient(request.isHttps()).newCall(request).execute();
 		if (!response.message().equals("OK")) {
