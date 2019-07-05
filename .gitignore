@@ -17,3 +17,17 @@ support-server/bin/
 support-server/gradle/
 *.class
 support-client/build
+/.gradle/
+itchat4j-master/
+generator/
+support-core/attachment
+support-server/src/main/resources/static
+support-server-web/build
+support-server-web/dist
+support-server-web/node_modules/
+support-server-web/.vscode
+template
+support-upgrade/build
+support-server-web/static/tinymce4.7.5/
+Location/
+support-permission/gradle
